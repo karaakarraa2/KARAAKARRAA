@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="om">
+<head>
+    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KARAA KARRAA - Full Edition</title>
+    
+    <link rel="manifest" href="manifest.json">
+
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-bg: #4B1F01; --sidebar-bg: #2D1301;
+            --paper: #FFF9F0; --text: #2D1301;
+            --gold: #D4AF37; --danger: #8B0000;
+        }
+
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--primary-bg); font-family: 'Crimson Pro', serif; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; left: -300px; top: 0; width: 300px; height: 100%;
+            background: var(--sidebar-bg); z-index: 1001; transition: 0.4s;
+            border-right: 2px solid var(--gold); overflow-y: auto;
+        }
+        .sidebar.active { left: 0; }
+        .sidebar ul { list-style: none; padding: 0; margin: 0; }
+        .sidebar ul li { 
+            padding: 15px 20px; color: #eee; border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer; font-family: 'Montserrat', sans-serif; font-size: 13px;
+        }
+        .sidebar ul li:hover { background: var(--danger); }
+
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 1000; }
+        .overlay.active { display: block; }
+
+        /* --- HEADER --- */
+        header { background: var(--sidebar-bg); padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--gold); }
+        .hamburger { font-size: 24px; color: var(--gold); cursor: pointer; }
+
+        /* --- PAPER PAGE STYLE (FIXED) --- */
+        .page-scroller { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        
+        /* Background adii (paper) barreeffama kee hunda akka liqimsuuf min-height kaa'eera */
+        .paper { 
+            background: var(--paper); 
+            width: 100%; 
+            max-width: 800px; 
+            padding: 50px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4); 
+            color: var(--text); 
+            min-height: fit-content; /* Akka inni barreeffamaan dheeratuuf */
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 600px) { .paper { padding: 30px 20px; } }
+
+        section { display: none; }
+        section.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Typography */
+        h1, h2, h3 { font-family: 'Montserrat', sans-serif; color: var(--danger); text-align: center; }
+        h3 { text-align: left; border-left: 4px solid var(--gold); padding-left: 10px; margin-top: 30px; font-size: 1.1em; }
+        p { font-size: 20px; line-height: 1.8; text-align: justify; margin-bottom: 20px; }
+
+        /* --- FOOTER --- */
+        footer { background: var(--sidebar-bg); height: 70px; border-top: 1px solid var(--gold); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+        .nav-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 8px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        
+        #installBanner { display: none; background: var(--gold); color: #000; text-align: center; padding: 10px; font-weight: bold; border: none; width: 100%; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <button id="installBanner" onclick="installApp()">INSTALL KARAA KARRAA APP</button>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div style="padding: 20px; text-align: center; background: rgba(0,0,0,0.2);">
+            <h2 style="color:var(--gold); font-size: 16px;">MATA DUREEWWAN</h2>
+        </div>
+        <ul id="menu-list"></ul>
+    </div>
+
+    <header>
+        <div class="hamburger" onclick="toggleMenu()">☰ MENU</div>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <img src="karaa_karraa_logo.jpg.jpg" style="width:35px; border-radius:5px;" onerror="this.src='https://via.placeholder.com/35'">
+            <span id="header-label" style="color:var(--gold); font-weight:bold; font-size:12px;">COVER PAGE</span>
+        </div>
+    </header>
+
+    <div class="page-scroller" id="scroll-box">
+        <article class="paper" id="main-container">
+            </article>
+    </div>
+
+    <footer>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <img src="author.jpg.JPG" style="width:35px; border-radius:50%; border:1px solid var(--gold);" onerror="this.src='https://via.placeholder.com/35'">
+            <div style="color:var(--gold); font-size:10px;"><b>Q. Hambisaa</b></div>
+        </div>
+        <div>
+            <button class="nav-btn" onclick="change(-1)">←</button>
+            <button class="nav-btn" onclick="change(1)">→</button>
+        </div>
+        
+    </footer>
+<button id="installBanner" style="display:none;" onclick="installApp()">
+    INSTALL KARAA KARRAA APP
+</button>
+    <script>
+        const bookPages = [
+            { title: "Cover Page", content: `<div style="text-align:center;"><h1 style="font-size:3.5em;">KARAA KARRAA</h1><p style="font-size:1.5em; font-style:italic;">"Karaa keerra deemii Karra keetti Seeni!"</p><div style="height:3px; width:80px; background:var(--gold); margin:30px auto;"></div><h2>QAJEELAA HAMBISAA MOOSISAA</h2><p>Finfinnee, 2015</p></div>` },
+            { title: "Mirga Barreessaa", content: `<h2>MIRGA BARREESSAA (COPY RIGHT)</h2><p>©Qajeelaa Hambisaa 2015. Mirgi barreessaa seeraan eegamaadha. Kitaabicha keessaa muranii baasuus ta'e akkuma jirutti heyyema barreessichaatiin ala maxxansiisuufi baay'isanii raabsuun seeraan kan dhorkameedha. Madda ibsuun bakka barbaachisetti garuu wabeeffachuuf mirgi laatameera.</p><p><b>Teessoo:</b><br>Email: kajelahambisa2013@gmail.com<br>Bilbila: +251 910 16 69 55</p>` },
+            { title: "Kennaakee", content: `<h2>KENNAAKEE</h2><p>Obboo/Aadde ---------------------------------------------------------- f</p>
+<p>Hangan si argadhetti osoo hin taane hangati qalbii koo dhuunfatte waanan si jaalladhuufan kitaaba kana gumaacha jaalalaa siif godhe. Kanaaf immoo gammachuu guddaatu natti dhagaahama.  "Lafa hin buutu; Lafeerra buuti malee" jedha mitiree Oromoon? Egaa Kitabattiin xiqqoo fakkaattu kun ergaa jireenya kee ijaaru hedduu waan ofkeessaa qabduuf gadi fageenyaan dubbistee akka keessatti of ilaaltun kabajaafi jaalala waaqayyoon siif gumaachuu barbaade. Ergaa asirra   argatteen ammoo jireenya kee hanga tokko akka jijjiirtu homaa shakkii hin qabu. Naaf jiraadhu.
+Karaa keerra deemi karra keetti Seeni!</p>
+<p>____________________________________________ kee,<br>
+   ____________________________________________ irraa.</p>
+</p>` },
+            { title: "Yaadannoo Kitaabichaa", content: `<h2>YAADANNOO KITAABICHAA</h2><p>Akka nama xiqqoo barate tokkootti wayitan yaadu Afaan koon barreessee hanga naaf dandaa'ametti itti dadhabee  kitaabattii xiqqoo kana dhalootaaf gumaachuuf carraa argachuun koo na gammachiisuun cinatti, hojii Artiistonni Oromoo gatii guddaa itti kaffaluun qubee bocanii anaafi isiniin 'dhaloota qubee' jedhanii maqaa nuuf baasan kun kan ajaa'ibaati. Yaalichi salphaa fakkaatus salphaa hin turre.</p> 
+<p>Boquu/ceekuu dhaloota Oromoo olqabanii dhaabachiisuuf karaalee hundaanuu gahee leencaa bahataniiru. Galaa wareegamaa nuun gahaniif galata guddaa ilmaan Oromoo mara biraa qabu. Garaa maranii gaara bahanii qorraan waxalamanii qoreenis waraanamaniitu anaaf dhaloota nacina jiraniif bu'aa hin safaramne kana buusan. Karaa/daandii irra adeemuun hin danda'amne mara qaxxaamuranii Galma kanaan nu gahaniiru. Kanaaf kitaabni xiqqoon kun Onisimoos Nasiib (Abbaa Gammachiisii) hanga Artiistii Hacaaluu Hundeessaa Boonsaatti, yaadannoo hin dagatamne naaf taati jedheen yaada.</p> 
+</p>` },
+            { title: "Galata", content: `<h2>GALATA</h2><p>Hangafni galatakoo isa beekumsa irratti beekumsa, ogummaarratti ogummaa, dandeettii irrattis dandeettii naaf dabalee ulaagaa namni guutuu hiin dandeenye mara naguuchise-Waaqayyoofi. Inni akkaataa jireenya koo isa gadaanaa osoo hin ilaaliin hamman ofjaalladhu gararraatti sababa najaallateef gulantaa rakkinaa hedduu na tarkaanfachiisee nama kanaa na taassiseera. Anis akka inni naaf ta'e nan ta'aaf yoon jedhe jechootaan taphachuu ta'a. Asuma taa'een galatakoo achii ol itti dhangalaasa-bira naaf haa gahu uumaakoo bira.</p>
+<p>Itti aansuun ammoo nama har'aa akkan ta'uufi rakkina koo irranfadhee barnoota kootti akkan jabaadhuuf gama barnootaanis tahe gama faayinaansiin deggersa kan naaf gootan, Barsiisota Mana Barumsaa Biiftuu Aayiraa bara 2006 fi 2007 na cina dhaabattan mara,  keessumaayyuu: B/saa Taarikuu Hambisaa(School Director), B/saa Malkaamuu Zanbaabaa, B/saa Zalaalem, B/saa Fedhasaa Hambisaa, B/saa Gammachuu( B/saa A/Oromoo), B/saa Magarsaa, B/saa Taarikuu(B/saa A/Ingiliffaa), Maatii Eebbisee Tashoomaa, maatii Gammachuu Dabalaa, Daani'eel Bultii fa'a maraa fi warreen biroon gatiin dadhabbii keessanii kunooti. Yoomiyyuu Isiniinan boona.</p>
+<p>Dabalataan ammoo hamma argattanitti kaffaltanii, bakka dhabdanittis liqeeffattanii dararaa rakkinaa keessa turtan cinattis yeroo ofirkaa hin qabnetti immoo ciniinsuu yaaddoon bakkan deemu hundatti naaf dhiphataa kan turtan maatii koo maraaf galanni koo dachaadha. keessumattuu, Haadhakoo sinbaatuu Galataa gatiin dadhabbii kee akka lafatti hin badneef ifaajeen nama har'aa ta'e. Ifaajeen kee durii sun Ifa kiyya har'aa naaf ta'eera. Umurii naaf dheeradhu.</p> <p>Abbaa koo Hambisaa Moosisaa-Atis jechoota ati itti gargaaramtee na gorsaa turte yaroon yaadadhu garaa koorraan gammada. "Ilmi namaa moofaa uffatee koora" naan jechaa turte. Dhugaa keedha ilmi namaa yoomiyyuu moofaa uffatee koora. Kaayyoo kiyya galmaan gahachuuf akkuma ati naan jette, anis moofaa uffadhee qorraan kooree aduunis addaadheen as gahe. Atis umurii dheeraa naaf jiraadhuu milkaa'ina itti aanus qooddadhu.</p> 
+<p>Barataa Amaanu'eel Gammachuu, B//saa Oliyaad Mangashaa fi  Barsiistuu Dammee Yimaruu, yeroon kitaaba kana barreessaa ture hojii koo mararfataa gargaarsi isin naaf gootan safara hin qabu.  Gatii keessanis waaqarraa argattu. Akkasumas Obboleewwan Koo Jaallataa, Karrasaa, Isqiyaas, Magarsaa, Kuulanii, Shaggee Hambisaafi warreen hafan hunda, Barsiisaafi barreessaa Lammii Jaal'ataa akkasumas Barsiisaafi barreessaa Obsinaan Bantii fi  namoonni ani maqaa keessan dagadhe hundaaf galanni koo dachaadha. Baga gammaddan Gatiin dadhabbii keessanii kunooti.</p>
+<p>Dhuma irratti warra kallattii meeqaan akkan galma hin geenyeef karaa natti cufaa turtaniif galanni koo dachaadha. Sababni isaa utuu isin tuffiifi nuffii akkasumas farra mul'ata koo naaf hin taane ta'ee eenyummaa kooyyuu wallaaleen hafan ture. Gahee keessan baahachuuf halkaniif guyyaa buutanii baataniittu.</p> <p>"Xiiqiin dammarra mi'oofti" jedha mitiiree Oromoon keenya wayita furtuu dubbiitiin dubbii banuuf cufu? Xiiqiin keessan jirma hin dhiibamne na dhiibsisee, dhagaa hin affeelamne na affelchisee, lubbuu kan bal'eessu summii na nyaachisee, gaara ol irra hin bahamnerra nabaasee, garaas nadhukkubseetu kunoo milkaa'ina hin madaalamne nabaachise. Gatiin dadhabbii keessanii faallaa ta'us, kunooti. Baga gubattanii aartan. Ammallee umurii naaf dheeradhaatii mulkaa'ina koo dhufaa jiru argaa!</p>
+</p>` },
+            { title: "Seensa", content: `<h2>SEENSA</h2><p>"Sa'a abbaan gaanfa cabse ormi ija jaamsa" jedha Oromoon keenya yeroo mammaaku. Ana dabalatee dhaloonni keenya jaarraa 21ffaa baay'een furtuu mataasaa harkatti qabatee balbalasaa banachuuf qaama biraa waan eeggatu natti fakkaata. Baay'een keenya yeroo ammaa kana ofuma keenya harkatti cabnee nama kan biraatti quba qabaa oolla. Bakka itti dhalanne malee bakki itti waamamnu beekamaa miti.
+                </p> 
+<p>Furtuun Addunyattii kanaa immoo harka keenya keessa utuu jirtuu banachuu dhiifnee warra banachuu danda'aniif ganamaaf galgala harka walitti reebaa ooluun keenya qofti immoo daran na gaddisiisa. Isa hojjetee agarsiise leellisuufi tumsuun gaarii ta'ee utuu jiruu,  ajaa'ibsiifannaa qofatti yeroon keenya dhumaa jira. Yeroon keenya xumuramaa jira. Hanguma umuriin keenya dabalaa adeemu, yeroon addunyattii kana irratti hojjechuuf nuuf kennamte xiqqataa jirti.</p>
+<p>Addunyaanis yeroo murtaa'aa qofaaf nutti kennamte. Addunyattiin rakkinaan badhaatuu taatus injifachuuf tattaafachuun dirqamakoo fi dirqama nama hundaati. Jijjiirama dhuunfaaf immoo qaamni sadaffaan jijjiiramaafi nama sana walitti fidu nama kan biraa osoo hin taane, abbaadhuma jijjiiramuu barbaade sanadha. Galma dhuunfaa ofii bira gahuufis immoo daandiin barbaachisaadha. Bakka ka'umsa kee irraa kaatee iddoo barbaadde tokko gahuuf hodhichi/karaan/daandiin jiraachuun dirqima. Dhalli namaas seensa mana isaaf akka tolutti daandiitti gargaarama.
+</p> 
+<p>Imalaan/Kara-deemaan iddoo akeekkate yookiin immoo bakka gahumsa isaa dhaqqabuuf karaa/daandii sirrii hordofuun dirqama. Kana hin taane taanaan bakkuma ka'umsa isaa duraanii sana marsaa yookiin naannaa'aa oola. Kun immoo milkaa'inaaf nama qopheessuu dhabuu danda'a. Karaan agarsiistuu kallattii bakkati itti adeemtuuti jechuudha. Akkas jechuun immoo karaan qaxxamuraa galma dhugaatti nama hin seensisu jechuudha. Karaa irra hin adeemne taanaanis qabeenya nama biraa barbadeessuun waan oolu miti.</p>
+<p>Galmi guddaan jedhamee waamamu kamiyyuu daandii ittiin seenan hin qabaanne taanaan boolla bineensi qotateen wal hin caalu. Kitaabni xiqqoon kun warra karaan harkaa walxaxeefi burjaaja'eef furmaatawwan hedduu qabattee dhiyaatteetti. Dubbistoota koon wal nabarsiisi waan naan jetteef carraa walbaruu isiniif kenneeraa walbaraa:</p> 
+<p>Dubbisaa/Dubbistuu koo, Akkam ati, Nagaa keetii? Dhiifama! Waan hundaa kan dursu nagaa waan ta'eefin osoon ofiikoo sin barsiisiin nagaan afaan saaqqadhe. Mee utuun dubbii sitti hin baay'isiin, ofii koon si barsiisaa nacaqasi. Karaa Karraan jedhama. Kankee garuu boodan sigaafadha. Sammuu barreessaa koo keessatti ergan hafee waggoota kudhan (10) lakkoofsiseera.</p>
+<p>Sababa ciniinsuu heedduun dhiphataa tureef akkan dafee dhaladhee si'iif namoota biroon walbaruuf barreessaan koo heyyema naaf hin laanne. Waaqaaf haa galatu! Akka carraa ta'ee dhaladhee ofbaree guddadhee kunoo har'a carraa siin walbaruu argadheera. Eessa deemuuf yaadaa jirta? Narra adeemtee bakka yaadde mara yoo hanqatte ittan siif gaafatama. Narraa achi gortee asis hin goriin. Osoo ana hin miidhiin seeraan   yoo ni adeemta ta'e Abbaan koo karri kuunnoo harka bal'isee si eegaa jira. Kanaafuu deemsea gaariin siif hawwa.</p>
+<p>Dubbisa Gaarii!!!!!!!!!!!!</p>
+</p>` },
+            { title: "Karaafi Karra", content: `<h2>KARAAFI KARRA</h2><p>Karaan daandii bakka ka'umsaafi gahumsa tokko gidduutti argamuudha. Akkaataa loqoda naannoo godina Gujiitti ammoo Hodhicha jedhamuunis ni beekama. Karaa/daandiin/hodhichi bu'aabayii yookiin rakkinoota baay'een kan guutamteedha. Karri immoo daandii mooraa/galma ittiin seenaniidha.</p> 
+<p>Karaan daddaba waan qabuuf akkuma bahaniin salphaatti bakka yaadan gahuun ni ulfaata. Galumsi yookiin seensi immoo dandiin malee hin dandaa'amu. Egaa jireenyi ilmoo namaas akkasumadha. Karichi rakkinoota ati jireenya kee keessatti kaffalte yookaan baaste yammuu tahu, karrichi immoo seensa keeti. Eessaa dhufte? eessa jirta? eessammoo gahuu barbaadda? Deebii gaaffilee sadeen kanaa salphaatti argachuuf ammoo kitaaba "Karaa Karraa" jettu kana utuu hin nuffiin dubbisuu yaali.</p>
+</p>` },
+            { title: "Boqonnaa 1", content: `<h2>BOQONNAA 1: DIRQAMA KEE</h2><p>Beeyiladoota sadiitu imalarra ture jedhama. Isaanis: harree, sareefi re'ee turan. Imala isaanii haala salphaan geggeeffachuuf konkolaataa qabachuuf waliin marii'atanii yaaduma kana irratti waliif galan. Wantoota deemsa isaaniif isaan barbaachisan mara erga qopheeffatanii booda imala isaanii eegaluuf daandii biyya qaxxaamuru cina dhaabatanii konkolaataa eeggachuuf turtii yeroo muraasaa geggeessan. Turtii daqiiqaa muraasaan booda konkolaataan tokko fiigaa dhufnaan dhaabsifatanii gatii geejjibaa irratti gargaaraa konkolaachisaa waliin dudubbachuu jalqaban.</p>
+<p>Ulfaatinni harree kan warra kaanii waan caaluuf qarshii tokko akka baastu gargaaraan konkolaachisaa itti himnaan qarshii tokko kan duraan kiisa keessaa qabdu itti hiixattee konkolaataa seente. Gatiin Sareen geejjibaaf baasuu qabdu saantima shantama ture, isheen garuu qarshii tokko kennite. Deebiin ishee saantima shantama ture, garuu gargaaraan konkolaachisaa waa'ee sareeyyuu hin yaadne ture-qarshii hafe hin deebifneef jechuudha.</p>
+<p>Re'eenis akkuma ulfaatina isheetti saantima digdamii shan akka baastuuf gargaaraan konkolaachisaa yaadachiisee ture, garuu oduun gurra duuchitee utuu inni hin argiin dhokattee konkolaataa keessaa buutee badde. 
+Harreen guyyaa sanarraa eegaltee gatii isheerra ture guutummaan guutuutti kaffalattee waan xumuratteef marattee daandii konkolaataarra ciiste. Kanaaf konkolaataan yeroo hundaa irraa goree darba. Namnis maaltaateeti? ofumashee dagannan lubbuu ishee gattee galgalaafi ganama daandiirra marmarattee ciisti malee maaltaate? jedheetu waa'ee harree dubbata. Isheen gahee isheerra jiru waan xumuratte itti fakkaannaan waa'een lubbuu dagatame. Dirqama isheerra ture baahatte mirgashee wallaalte.</p>
+<p>Sareenis akkuma amala ishee guyyaa gaafasii irraa eegaltee yeroo hundaa dutaa/iyyaa konkolaataa cina fiigdi. Namni garuu kana yaada keessa galchee hin jiru. Calliseetuma "maaliif sareen dutaa konkolaataa faana fiigdi"? Jedhee gaafata. sababiin isaa garuu deebii saantima shantamaa waan biraa qabduufi. Erga gaafa konkolaaticha keessaa buutee baddee Re'eenis immoo sagalee huursu dhageenyaan konkolaataa waan itti fakkaatuuf fiigdee baqatti. 
+Sababiin isaa gowwoomsitee konkolaachisaa duraa baddee kaffaltii ishee waan hin raawwanneef dirqamatu irra jira. Mirga argattee konkolaataa keessa teessee dirqamashee dagatte. Baacoo gabaabduu kanarraa ergaa hedduu barachuu dandeenya. Akkuman olitti haala salphaan addeessuuf yaalee ture, Jireenyi dhaloota jaarraa amma keessa jirruu kun karaa sadiin ilaalamuu danda'a. Isaanis:</p>
+<h3>1. Fiigichoo/dhimma koo raawwadheera warra jedhan</h3><p>Isaan kun warra waa'ee namaa osoo hin taane waa'een dhuunfaa isaaniiyyuu itti hin dhagaa'amne. Warra maqaafi safuun biratti hin argamne. Warra jireenyaaf tattaafatan osoo hin taane, jireenyuma carraadhaan argataniin jiraatan jedhamu. Warri kun gara isaanii guuttannaan kan biraaf haa hafuu warra hin beekneedha. "Ani duunaan margi biyya lafaa irratti hin margiin" jette harreen jedhu mitiiree abboonni keenya yeroo mammaakan. Walumaa galatti gareen kun ofii isaaniif dhimma isaan barbaachisu mara xumurannaan dhalootaaf dhimma hin qaban.</p>
+<h3>2. Dhimma koo raawwadheera garuu dhimmikoo naaf hin raawwatamne warra jedhan</h3><p>Warri kun immoo yeroo hundumaa gaaffii kaasuun beekamu. Yoo toleefis, itti bades, gammachuu qabaatanis, gaddanis kun 'maaliif akkas ta'e?'  "Kun immoo maaliif akkas tahuu dide?" jedhanii hojii qaamni tokko hojjete keessa warra huuba barbaadaniidha. Warra arrabni isaanii akka eeboo qarame, Gurri isaanii waanta hin dhaga'iin dhaga'eera, waanta dhaga'e immoo hin dhageenye jechuun warra beekamaniidha. 'Gungumtoota' jedhamuunis ni beekamu.</p>
+<h3>3. Dhimmi isaanii raawwatameefi warra gahee isaanii hin raawwanne</h3><p>Warri kun immoo gowwoomsituu jedhamuun beekamu. Yeroo hundaa afaan isaanii keessaa kan dafee bahu dhara/soba. Tokkotti toluuf tokko irratti murtii sobaa murteessuu, Tokko biratti jaal'atamuuf tokkommoo akka jibbamu, jireenya mataasaanii fooyyeffachuuf jireenya nama kan biraa irratti maluu warra jaal'atan jedhamuudhaan beekamu.</p> 
+<p>Haalli jireenya dhaloota keenya har'aas kanaan walfakkaachuu hin hafu. Tokko gahee isarra jiru yookiin dirqama namummaa isaa waan xumurate itti fakkaannaan maaltu nadhibe jedhee qoma dhiibee jiraachuu barbaada. Tokkommoo "dirqama koo mara raawwadheera, fiigichoo koos xumuradheera kanaaf hanga ammaatti deebii hin arganne.
+<p>Hojjedheera, gaafadheera, ifaajeera, xiinxaleera hanga ammaatti garuu waanti naaf deebi'e hin jiru."Deebii kootu hafe" jedhee iyyee boo'aa mankaraaraa bara isaa lakkaa'a. Inni kan biraan ammoo waliin dha'ee achis fakkaatee asis fakkaatee giddu nyaattee ta'ee gowwoomsaan jiraachuu barbaada. Kana fa'atu qiinqanii ta'ee dhaloota nyaachaa jira.</p> <p>Egaa atis kan kiyya xumuradheera jettee yaadaa jirta ta'a. Jireenyi immoo hamma lubbuufi foonni walkeessa jirutti xumura hin qabu. Kana jechuun jireenyi imaladha jechuudha. Kankee xumuramaa yoo sitti fakkaate, isa eegaluuf jechaa jiruuf daandii saaqi. Jireenya keessatti gaaffiin ati qabdu jiraachuu danda'a. Gaaffii qabduuf deebii yookiin fumaata waaraa kennuuf yaalii geggeessuun dirqama ati jireenya keef baasuu qabduudha Sababni isaa gaaffii keef deebii laachuu hin dandeenye taanaan atumtiyyuu jireenya dhalootaa irratti gaaffii ta'uu dandeessa waan ta'eefi.</p> 
+<p>Dhaloonni ammaa dhaloota fakkaataafi fakkeessaadha. Fakkeessuufi fakkaachuu utuu hin taane, fakkeenya ta'uuf galgalaaf ganama ifaaji. Isa darbeef utuu mataa qabattee iyyituu inni ammaafi inni dhufaa jiru akka sin darbineef oftasgabbeessi. "Obsaan aannan goromsaa dhuga" jedhu mitiiree abboonni keenya. Obsaaf ogummaa qabaadhu. Waa'een hiriyaa kee sibiraa milkaa'ee sin gaddisiisiin. Karaa milkaa'ina isaa suuta jedhii caqasi. Mul'ati isaaf kankee garaagara ta'us karichi si gargaaruu danda'aatii.</p>
+<h3>GAHEE KEE BAHATTEE?</h3>
+<p>Konkolaataa oofuuf dirqama daandiin aspaaltii tahuu hin qabu. Bu'uurumti daandii adeemsa konkolaataa mataan isaayyuu cirracha tahuu nama hin shakkisiisu. Daandiidhuma durii kan dhagaawwan caccaboo, awwaara(dhukkee) fi laaqii(dhoqqee) fa'an guutamee wayita konkolaataan bakkaa gara bakkaatti adeemsa taasisu nama mudduuf dhiphinaa hamaa keessa nama galchaa oolu sanatu akkati argite sanatti bareede.  Innis darabee isaa eeggatee Yeroo isaaf kennametti, bara keessaa bara, ji'a keessaa ji'a, torban keessaa torban, guyyaa keessaa guyyaa kennameefitti gara asapaaltii miidhagaa sanaatti jijjiirame.</p> 
+<p>Hiree/gahee isaa xumurachuuf guyyaa isaa eeggachuu waan danda'e natti fakkaata. Daandichi walqixxaatee akka barbaadetti konkolaataan irra haa dirrisuyyuu malee bu'uurr isaa biyyee yookiin cirrachadha. 
+Egaa jireenyi tarkaanfii dhala namaas kanaan walfakkaachu hin hafu. Jireenya mijataa jiraachuuf haala mijataa jalqabumaan argachuunis dirqama waaqatti kenname miti. Addunyattii nuti illaallee, keessatti bashannannee akkasumas keessa jiraannee quufuu dadhabne kun bu'aa argannoo  harka waaqaati. Waaqi keenya guddaan-Rabbiin keenya utuu anaafi si'iin hin kalaqiin wantoota baay'ee kalaqee lafa nuuf kaa'eera. Kophaa isaa tottolchee bareechee dhala namaatti kenneera garuu dhalli namaa irratti hojjechuuyyuu miti irra jiraachuunuu itti ulfaateera.</p> 
+<p>Saanduqa uffataa yookiin meesha barbaanne keessa kaawwannu fi siree irra rafnee boqonnuufi balbalawwan manneen keenya ittiin cufannu hojjechuuf xaawulaawwaniifi mi'oonni adda addaa akkuma nubarbaachisan, jalqabumatti yaadee wantoota bu'uura jireenya keenyaaf barbaachisan heedduu akkaataa faayidaafi barbaachisummaa isaatti lafa nuuf kaa'eera-uumaan keenya. Isa kanaafiyyuu galata hin safaramne nubiraa qaba.</p> 
+<p>Egaa akka irra jiraattuufi irratti hojjettuuf dachee siif keenneera. Kan ati irra sochootee waan barbaadde yoo raawwattelle natti ulfaatte, nawaraante, narra qottee facaafatte, narratti horattee sooromte, narratti ijaarratte, namiiteetta hin gaa'a miilakee narraa kaasi siin hin jenne, arjaa waanta ati  irra facaafte gatii tokko malee deebisee biqilchee ijasaa yookiin firiisaa dachaan baay'isee siif deebisu, Obsa qabeessa jiraafi du'aa kee siif baatee taa'u-dachee yookiin lafa ati irra jiraachaa jirtu kana.</p> 
+<p>Sammuu dachee kana ittiin faayuu dandeessus sikeessa kaa'eera. Bishaan anaaf si'iin akka hin liqimsineef uumaan koof uumaan kee manii manii/bakka bakka isaatti galcheera. Dukkanni akka si hin dhoksineefis ifa hin dhaamneef hin dukkanoofne sibadhaaseera-anas badhaaseera. Akka darba sin dhowwanneef tabbaafi tulluu siduraas dayyaaseera. 
+Bishaan fuula lafaa uwwisee jireenyaaf siif hin mijaanneef naaf hin mijanne sanas isa kaaniin galaana, isa tokkoon garba, isa kan biraanis hara jedhee isa aniif ati irraa waraabbannee dhugnuufi horii keenya obaafachuun jiraachuu dandeenyu sanammoo laga jedhee maqaa itti nuuf moggaaseera. Akka irra jiraannuuf lafa/dachee bareedduu kana nuuf kenneera. Dacheen immoo duwwaa miti.</p>
+<p>Akka waliin jiraannuuf bineelda keessaa beeyiladoota manaa, akka miidhaa nurraan hin geessisneef ammoo binoonsota bosonaa/baddaa nu badhaaseera. Akki ittiin jijjiiramnuufi dhaloota jijjiirruuf immoo albuuda gati jabeessa kan akka warqii, meetii, pilaatiiniyeemii, meerkuurii, diyaamondiifi warreen kana fakkaatan mara keessa dachee nuuf kaa'eera. Akka keessatti of-lakkoofnuuf addunyaa ittiin to'annuuf qabeenya ijaan hin mul'anne, hin dulloomneefi yoomiyyuu hin dhumne, YEROO nu badhaaseera.  Akka nyaannuuf biqilootaaf bineeldota, akka dhugnuufis bishaan hin gogne irra dacheefi keessa dachee nuuf kaa'eera.</p> 
+<p>Dubbisaako/dubbistuuko-na oofkalchi gaaffii tokkon sigaafadhaa! Maaltu hafe waanti uumaan sidhowwate? Mee kamtu si hanqate? Maalan beeka yoona-mana dhagaa, konkolaataa, biyya gaarii, qabeenya guddaaa, maallaqa tiriiliyoonaan lakkaa'amu jechuu dandeessa ta'a.  Kun hundi deebii kee tahuu mala. Deebiin koo garuu waanti uumaa biratti hafee isa komachiisu tokkumti hin jiru kan jedhuudha. Mee jecha barreessaa Miratuu Shaanqoo, kan inni kitaaba isaa ''Garbummaa Birmadummaa fakkaattu'' jedhu keessatti eeree ture tokkon siyaadachiisa. ''Gad-aantumnaan dhaloota UTUUtti kennaa Waaqaa fakkaata'' isa jedhuufi ''Dhaloonni UTUU of ilaaluu dhiisee ol ilaala'' kan jedhuudha.</p> 
+<p>Kun dhaloota ammaa kanaaf ergaa guddaadha.  Dhaloonni ammaa mirgasaa qofa eeggatee dirqama isarra jiru mara kuntaalatti naqee Waaqatti asii ol fe'a. Na oofkalchi. Of-jijjiiruuf garuu mirgis dirqamnis kanuma ofiiti. Wantootan armaan olitti eere irraa kan hafe hunduu kankee tahuu mala. Kan ati uumuu yookiin kalaquufi hojjechuu qabdu-dirqama namummaa sirra jiru. Dhiifamaa wajjin, Mee waanta hojjetaa jirtu altokkoof dhaabiitii ofduuba waggoota muraasa achi yaadi! Eessaa gahuuf deemaa jirta?, Eessaa kaate? Eessa geesseettammoo laata?</p> 
+<p>Akkati yaalii geggeessitee waan tokko hojjettee dhalootaaf lafa keessuuf ofiisaatti fakkeessee si uumeera. Inni dirqama waaqummaasaa bahachuuf wantoota ani armaan olitti siif eeruu yaale uumee si sibadhaaseera. Ofiisaatti fakkeessee erga sikalaqee ofiikee immoo sitti kenne. Ati ofuma kee harka waan jirtuuf nama kan biraa hin eegiin. Dorgommii fiigichaa warqii argamsiisu injifachuuf miila bitachuu hin dandeessu. Injifattee gammaduuf har'a teessee daawwachuu irra miiluma keen fiiguu yaaluun dirqama namummaa keetiiti.</p> 
+<p>Nama jedhees maqaa siif kenneera. Wantoota inni waaqummaa isaatiin uumee lafa siif kaa'e irraa dhalootaaf lafa kaa'uuf dirqama dhaloota siduuba jiranii bahatteettaa?</p> 
+<p>Kan kee hoo meerre dirqamni namummaa kee? Ati gahee kee bahatteettaa? Moo callisteedhuma uumaa keetti achii ol uuruu dhiibaa jirta? Darbee darbee yeroo ammaa kana dhaloota hedduu irratti falaasama(fallacy) walfakkatu tokkon dhagaha.</p> 
+<p>Innis ''fallacy of false cause'' kan Loojikiin jedhuudha. "Waan akkas taheef carraan akkasii kun nadhaqqabe" "Taphattoonni garee tokkoo dirree kubbaa miilaatti injifatamanii har'a waan uffata bifa gurraacha qabu uffanneef injifatamne" jedhan. Kun falaasama sababa sobaa dhiyeessuuti. Namni miila qabu kamiyyuu kubbaa taphachuuf dandeettii qabaachuu danda'a.</p> 
+<p>Kubbaa taphachuu danda'uun immoo dandeettii injifachuu qabaachuun wal hin argu. Taphni kan biraa injifannoonis kan biraa-wal hin fakkaatan jechuudha. Dirree kubbaa seentee beekta ta'a. Fiigdee taphachuu wayita dandeessu, akkuma fiigdee taphatteen goolii galchuu hin dandeessu. Kana jechuun utuu galchiin hin galiin kufanii cabuun, miidhamuun, dadhabuun, kallattii galchiin alattillee kubbaa rukutuun jiraachuu danda'a jechuudha. Injifachuuf garuu miliqqeefi tooftaa taphattoota garee faallaa isaanii qabuu danda'uun dirqama ture. Yaa dubbisa!</p> 
+<p<Nadhageessaa mee qixa kam geessa? Atis egaa Sababoota kaayyoo keen wal hin fakkaanne tarreessaa dorgommii itti jirtu hin injifattu. Dirgommicha injifachuuf dhimmi dursi kennamuufii qabu uffata uffattu, kophee kaa'attu, akkasumas nyaata nyaattu osoo hin taane, xiyyeeffannaa ati galma keef qabduudha.</p>
+<p>Uffanni, kopheeniifi nyaatni fayyummaa nafa ofiif baay'ee barbaachisaa ta'us, bu'uura milkaa'inaa ta'uu hin danda'u. Kana jechuun hanqinni nyaata madaalamaafi uffataa galma ati karoorfatte si hin hankaassu jechuudha.  Mul'ata ofii immoo nafa ofii irratti osoo hin taane fuuldura ofiitti ilaalu. Namni biskiliittaa oofu ofii isaa jala ykn ofcina yoo ilaale salphaatti kufuu akkuma danda'u namni mul'ata qabus milkaa'uuf dirqamni irra jiru gara mul'atasaa isa fuulasaa duraa itti argamuu caqasuu(ilaaluu) malee hanqinoota naannoo isaa jiran lakkaa'ee sababa hin barbaachifne tarreessuun kufaatii hamaa keessummeessuudha.</p> 
+<p>Yeroo hundumaa karoorfatanii hojjechuun yeroo hundumaa milkaa'uu hin agarsiisu.  Barreessaan keenya jallatamaafi kabajamaa Eebbisaa Baayisaa Abeetuu Kitaaba isaa MIILTOO keessatti akkas jedhee nuuf barreesseera.  ''milkaa'inni kan warra barbaaddataniiti. Teessanii milkaa'ina hin eeggatinaa hojii keessa barbaada''.</p> 
+<p>Dhugaa isaati. Warqii bareedaa gati jabeessa sana argachuuf dirqama biyyee baay'ee bishaan keessatti bulbuluun akkuma barbaachise, milkaa'ina ajaa'ibsiisaa sana argachuufis hojii baay'ee hojjechuu yaaluun dirqamadha. Hojii kee keessa milkaa'ina adamsitee argatta jechuudha.</p>
+<p>Yeroo baay'ee anas ta'e namoonni gariin ''maaliif uumaan koo akkas nagodhe?'' ''Maaliifis garaa natti jabaate?'' Yeroo jedhan darbee darbee nan dhagaaha. Waanti naa ajaa'ibee fi na raajeffachiise garuu dhalli namaa qilleensa ittiin harganuuf gatii hammamii kaffalee beeka? Keessumatti gatiin ooksijinii hangam ta'a? Kan jedhuudha-yeroo hundaa gaaffiin kor-qalbii koo keessaa natti dhagaahamu.</p> 
+<p>Haalli tekinooloojii yeroo ammaas saffisaadha. Akkuma addunyattii koomboo kubbaa fakkaattu kanaa keessatti baay'inni uummata ishee dachaan dabalaa jiru, saffisni tekinooloojiis biyyoota murtaa'an keessatti dachaan dabalaa jira. Namni cufti-baadiyyaas tahe magaalaan wayita ammaa kana manasaa keessaa ibsaa(anniisaa) elektiriikaa namoota muraasarraan kan hafe baay'een ni fayyadamu. Isa kanaafiyyuu abbaan tekinooloojii Waaqni dagatamee "galata kee tekinoolooji" jedhanii darbu.</p>
+<p>Gatiin itti fayyadama humna ibsaa namtolchee ni kaffalama. Garuu biiftuuf guyyaatti gatiin kaffalamu utuu jiraatee hangam ulfaataadha? Argannoon xiqqoon dhala namaa sun waanuma duraan uumaa biraa dhuferraa argamte. Waanta haaraa hin turre. Uumuuf tolchuun ammoo garaagaradha. Dhalli namaa garuu yeroo ammaa kana waan tolfame faarsa.  Atimmoo carraa heedduu waan qabduuf uumama uumaan sitti kenne kanarraa waa tolchi uumaakee faarsi.</p>
+<p>Kanaafuu, yaadni koo walii galaa Uumaan wantoota gurguddoo ta'an kana badhaasa godhee dhala namaaf erga kennee komatamuu hin qabu. Eeyyee komatamuu hinqabu. Ofii keenya komachuu, ofirrattis dubbachuutu nurra jira. Uumaan keenya ifa aduu nuuf kalaqee, kan elektiriikii nuuf dhiise, dachee irra jiraannu nuuf kalaqee mana irratti ijaarree keessa teenyu nuuf dhiise, bifa keenya kalaqee uffata itti uffannu nuuf dhiise. Anaaf si'iinis kalaqee wantoota jireenya keenyaaf barbaachisan immoo akka nuti kalaqannuuf nuuf dhiise. Kanaafuu akka kootti komatamuu hin qabu jechuu barbaadeetani. Uumaan nu caalaatti waan nu jaallatuuf dirqama waaqummaasaa baheera. Atis ni dandeessaa, kahii gahee kee bahadhu.</p> 
+<h3>Mul'ata Qabaadhu</h3>
+<p>Waanti gaariin karaa salphaan gonkumaa argamuu hin danda'u. Yoo argames waanuma salphaaf nu gargaara. Waanti yaraa/badaan garuu karaa salphaan argamuu danda'a. Waanti karaa salphaan argamu immoo waanuma salphaaf kan fayyadu qofadha. Namoota baay'eedhaaf Milkaa'uu jechuunis qabeenyaan guddataanii duroomuu fakkaata. Garuu akkas qofa miti. Milkaa'inni saarkaa walxaxaa hedduu qaba.</p> 
+<p>Buna baalattii ciranii akkuma sanaan bulbulanii yookiin bushaaniin makanii dhuguun hin danda'amu. Utuu yaalamees faayidaa isaan ala tahuu danda'a. Milkaa'ina nama tokko irratti arganis akkuma salphaatti bira gahuu hin danda'an.</p> 
+<p>Handaanqoon hanqaaqxee wicii/cuucii ishee baasuuf yoo xiqqate torban sadiif walitti fufiinsaan hanqaaquu ishee haammachuun dirqama. Sana galmaan gahuuf guyyoottan kana akkaataa itti fayyadama yeroo ishee kan duraanii irra ni eeggatti. Sababni isaa fakkaattii ishee guddifachuuf hanqaaquu/buphaa buuste irraa qilleensa eegdi.<p> 
+<p>Akka durii sana akkuma barbaadde kosii keessa naannoftee waa bu'achuun yeroo ishee hin balleessitu. Fakkaattii ishee arguun dirqama jireenya ishee waan ta'eef nyaata ishee guyyaatiifis ta'e waanta biraaf iddoo hin laattu. Walumaa galatti sadarkaa milkaa'inaati jedhamanii warra yaadaman keessaa muraasni:</p>
+<h4>Mul'ata(vision): - waanta gochuuf/raawwachuuf karoorfattee.</h4>
+<h4>Karoora (Strategic Plan): -kan ittiin galma kee dhugoomsitu.</h4>
+<h4>Kufaatii (Failure):- karaa/daandii kee irratti guyyaadhaa guyyaatti waanta si mudataa oolu</h4>
+<h4>Abdii (Hope)>:- Jireenya fuula kee duratti ati qabdu.</h4>
+<h4>Milkaa'ina (Success): Inni kun galma kee isa dhugaadha.</h4> 
+<p>Egaa mul'anni kee ija keeti. Kanaaf karoora kee, rakkoo fuulduratti si mudachuu danda'u, abdii kee fi milkaa'ina kee ofiikee duratti ittiin ilaali. Karoorri kee harka kee isati ittiin hojjechuun milkaa'ina keen wal arguu dandeessuudha. Karoora keerratti hojjechuu yaali. Kufaatiin qormaata hojiifi jireenya kee keessatti si mudatuudha. Kunimmoo sammuu keen itti yaadamuu qaba. Kufaatiiwwan si mudachuu danda'an dursii xiinxali.</p> 
+<p>Iddoo kuftetti akka hin hafne sammuun kee dursee itti amanuu qaba. Gurri kee abdii ati jireenya keef qabduudha. Kanati ittiin duraafi duuba kee dhaggeeffachaa galma keetti aggaamtu. Warreen kana hunda akka barbaachisutti kunuunsiteetta taanaan galma keetti ni seenta.</p>
+<p>Addunyaa kanarras namni mul'ata hin qabne waan jiru natti hin fakkaatu. Nama maraateefi joonja'e irraan kan hafe dhalli namaa hundinuu ulfa yookiin dadhabbii mul'ataa qaba. Ulfa dhiirris dubartiinis ulfaa'uu danda'an. Umuriin kan hin daangessine. Ardiilee addunyaa kanarra jiran keessatti karaa uumamaan dhiirri hanga ammaatti waa garaatti hafe hin argamne.</p>
+<p>Yoo argames sirrii natti hin fakkaatu-faallaa seera uumamaa waanta'eef. Ulfa Mul'ataa garuu dhiirris dubartiinis mataa keessa qabu. Ulfa mul'ataa yeroon hin murtoofne baatee miixataa dhiphataa jooraa jawwaraa oola-dhalli namaa martinuu. Atihoo dadhabbii mul'ataa qabdaa? Waa mataatti si hafee jiraa? jechuu kooti. Sababni isaa daa'imni dhalachuuf ulfaan garaan akkuma guddatu, mul'atni ifa bahuuf sammuun guddachuu qaba waan ta'eefi.</p> 
+<p>Sammuun guddachuun immoo sammuun bokokuu yookiin dhukkubsachuu miti, sababni isaa inni kun mataa bowwuu/dhukkubbii mataa waan ta'eefi. Milkaa'uun egaa wayita ulfa mul'ata ofiirraa furamaniidha. Furamuu kan jedhuun yoon hiike akka dansaa natti miidhaga. Duris ta'e amma-addunyaa kana irraa waanti tola argamu gonkumaa hin jiru. Milkaa'insi harka namaa keessaa miti kan argamu. Carraadhaanis miti kan argamu.</p>  
+<p>Firaan, ilma abbaa qabeenyaa ta'uun, biyya gaariitti dhalachuun, maatii gaarii irraa dhalachuu, gubboo kaffaluun, qarshii gahaa qabaachuufi kanneen kana fakkaatan cufti milkaa'ina nama hin gonfachiisan.</p> 
+<h3>Atis Gatii Milkaa'inaa baasi</h3>
+<p>"Maaliin milkaa'u?" Gaaffii jedhuuf deebiin Gatii baasuudhaani. Gatii maalii? Gatii sadarkaa jireenyaatiif kaffalamuu qabu mara. Isaanoo maalfa'i? Oljechuun dura gadjechuu, ulfaachuun dura salphachuun,  kabajamuun dura tuffatamuun, qabaachuun dura dhabuun, quufuun dura beel'auunis, uffata bareedaa uffachuun dura daaruufi qullaa tahuun, beekuun dura wallaaluun, leellifamuun dura arrabsamuunis  furdachuun dura qal'achuun, gabbachuun dura huuqqachuun, ho'uun dura qorruun, beekamuun dura wallaalamuun,  jiraachuusaatti amanuun gatiiwwan milkaa'inaati.</p> 
+<p>Dubbisaa/dubbistuu koo har'a sadarkaa akkamiirra jirta? Mee atumti ofilaallee kana keessatti ofilaali. Kaayyoo keef jettee agabuu bultee hin beektuu? Tuffatamtee hin beektuu, ceephaa'amteehoo hin beektuu? Namoonni akkakee jechootaan si adoochanii hin beekanii? Mula'ataa fi kaayyoo qabda ta'a garuu qabeenyi hin jiru. Namoota kaan waliin socho'uuf ni feeta ta'a, garuu humni jiraachuu dhabuu mala.</p> 
+<p>Dhalootaaf ibsaa ibsuuf fedhiin ati qabdu olaanaadha ta'a garuu Ilaalchi ati kaayyoo keef qabduuf namoonni siif qaban garaagara tahuu mala. Akka hiriyoota kee atis sadarkaakee eeggattee ni carraaqxa ta'a garuu maatii gahaa yookiin namni sibira dhaabatu hin jiru. Hiriyoota kee waliin gahumsa keessa kee jiru dudubbachuu ni feeta ta'a garuu isaaniin ofmadaaluu hin dandeessu-haala uffannaafi jireenyasaanii ilaaltee. Sammuun kee mul'ata hedduun badhaadhaa tahuu mala, garuu karaan yookaan daandiin ittiin bira geessu hin jiru ta'a.</p> 
+<p>Seenaa koo tokkon sitti himaa gurra natti qabi-nadhaggeeffadhu jechuu kooti.  Barri isaa 2006 dha. Barataa Kutaa 11ffaati. Barnoota kootti baay'een jabaadha. Haalli koo garuu barataa kutaa kudha tokko baru mitii barataa kutaa tokkooyyuu nan fakkeessu. Haala ulfaataadha- Dubbachuuf kan nama rakkisu.</p> 
+<p>Akkaataan uffannaakoo, biftikoo, barruuleen koo, diddeebiin mana barumsaatti godhuuf kan kana fakkaatan kan barattoota warreen kaanii irraa adda ture. Surrii/koofoo ani kaawwadhu baldhinni isaa yoo xiqqate nama furdaa lama ni gaha.</p> 
+<p>Kanaaf yoon qabattoo hidhadhu fuulduraan qabattoo jalaan gadi kof jedhee fokkisee muldhata. Kun immoo barataa waan nan fakkeessineef daran hamileen barnoota koof qabu laaffiseera. Kopheen ani kaawwadhu bitaaf mirgaa karaa quba abbuudduu lamaaniin akka hodhuuf hin mijannetti uratanii qubeelee lamaan bakkeetti muldhatu. Biyyi Tosiwoo (bakki dhaloota koo) magaalaa Aayiraarraa yoo xiqqate deemsa sa'aatii lamaaf walakkaati. Innumtuu bosonaan marfamee argama.</p> 
+<p>Daandiin isaa asphaaltii miidhagaa ammaa kana osoo hin taane cirracha waan tureef deemsaaf hin mijatu ture. Ji'i isaas birraa waan taheef akka malee qorra. Guyyaas aduun bahu waanuma abidda waaqa irraa kutee gadi darbatu fakkaata. Halkanni dhufee darbu yaaddoo ture. Deemsa kaleessa deemameef bututtii kulkulfachaa kan boriif ciniinsifachuu ture.</p> 
+<p>Lafa hamma kana dheeratun marmaaree baradha jedheen mudhii koo hidhadhe. Qorriif aduun walii galanii harka koo babbaqaqsanuuru. Kana hunda damdamadheen daree barnootaa kootti yeroon argama. Ganamniifi galgalli fiigicha.</p> 
+<p>Wayitan daree seenus Sababa kopheen koo baay'ee ciccitaa taheef ija barattootaa duratti bahee hirmaannaa gochuuf hamilee hin qabu. Daree cufti walgahee waan natti seeqqatu/kolfu natti fakkaata. Barattoota daree kiyya waliin dudubbachuufis ta'e deemuuf sammuun koo naaf hin heyyemu. Kun immoo umurii malee yaaddoon akkan dhiphadhu na taasise.</p> 
+<p>Yeroo boqonnaan gahus ala bahuuf nan sodaadha. Daree gadhiisee boqonnaa bahuuf rakkinni koo muldhatee barataan bor natti kolfuu irra ukkaamamee taa'uun filadha. Kanaaf carraan ani qabu ganama yeroon olgaluufi guyyaa yookiin yeroo galli gahee hundumtuu laaqana isaa nyaachuuf gara manasaatti dirrisu animmoo akka hiccitiin koo bakkee in baaneef duubatti hafee ofitti gungumaa gara mana dubbisa kitaabaa/library seenee kitaabatti mukuu bahuudha.</p> 
+<p>Gahumsa dhokataa keessakoo jiru baasee mul'isuuf yeroon itti haala koo hundumaan ceephaa'aumutu baay'ata. Garuu homaa natti hin fakkaatu.  Baay'ee yaadee dhiphadhullee, Keessi koo yeroo hundaa waan tokko yaada. Innis ''Yoo waaqayyo jedhe anis gaaf tokko nama nan ta'a".</p> 
+<p>''If God say, one day I will be to the man'' kan jedhu yeroo hundumaa gurra koorraa kan uursaa oolee bulu ammoo daran hamilee koof jajjabina ture. Inumaayyuummoo beela hamaa naqaqqabe irraan kan ka'e boqqolloo waadamaa namni irraa nyaatee xixiqqaasaa gara mataatti hambisee gate utuun karaa dheeraa kana deemee baradhuu nyaachuun koo mul'ata koo dhugoomsuuf baay'ee tattaafachuun koo hundaan ol nagammachiisa. Keessumattuu guyyattii ani mulluu/boqqolloo affeelamaa haati kiyya ganama yeroon manaa bahu naaf laatte citaa/marga keessa dhokfadhee mixiin/goondaan najalaa fixxe sana wayitan yaadadhus waanan jedhun dhaba.  Hamma kiyyatti anis gatii kaffaluu kooti. Naaf hin tuffatiin dubbisaako/dubbistuuko. Kun mudannoo ani keessa darbeedha.</p>
+<p>Kaayyoo yookiin mul'ata koo isa''Yoo waaqayyo jedhe gaaftokko anis nama nan ta'a'' jedhu sanaaf gatiin kaffalee darbeedha. Gatiin kaayyoo ofiif baafamu xiqqaas guddaas hin qabu.  Kana fa'atu jiragaa-yaa dubbisaa/dubbistu koo jaallatama/jaallatamtu. Anis baay'ee waanan sijaalladhuuf jechan waantan argeefi waantan hubadhe waa'ee milkaa'inaa irratti hubannaa akka argattuuf sigargaaruuf jedhee dubbii afaanitti hambifachuu dadhabe. Milkaa'uuf gatii baasuu yaali.</p>
+<h3>Abdii hin kutatiin</h3>
+<h4>If you will never give up the day after tomorrow is beautiful-</h4?
+<h4>Jack Ma. (Ali Baba)</h4>
+<p>Yoo nama abdii hin kutanne taate guyyaan boritti aanee dhufu siif bareedaadha. Waanti kamiyyuu ulfaataas ta'e salphaa miti. Yoo abdii kutatte, waanti kamiyyuu ulfaataa sitti fakkaachuu danda'a. Kuusaan kaayyoo dhala namaa abdiidha. Yoo abdii qabaattemmoo fuuldura keetti guyyaa bareedaa tokko ni argita. Inni ati abdataa jirtu isati argattee jirtu irras akka caale beeki.</p> 
+<p>Qoreefi qorri karaakee karrakee akka sin hankaassineef mogoleen sin buhiin. Kaleessi yoo darbe, har'i kankeeti. Innimmoo qabeenyaa kee isa warqee gati jabeessaan hin madaalamneedha. Har'atti haala gaariin fayyadamnaan Boriin kee bareedee siif dhufa.</p>
+<p>Waanti kufee lafatti hafu waanta lubbuun keessaa baheedha. Midhaan muranii lafa buusaniyyuu sababa miciree qabduuf biqiltee ija kan biraa kenniti. Kanaaf hanga lubbuun sikeessa jirtutti milkaauuf tattaafadhu. Wantoonni ani armaan olitti deebii kee tahuu malu jedhee siif tarreesse hundimmoo bu'uura cimaa irratti kan hundeeffameedha. Innis mudannoowwan si quunnaman mara dandammattee hiriyoota kee hundumaaf JAALALA yoo qabaatte, galmi ati itti hin keessummeeffamne tokkollee hin jiru.</p>
+<h2> Qabxii Ijoo Boqonnaa kanaa</h2>
+	<h3><p>1. Jireenya mijataa jiraachuuf haala mijataa jalqabumaan argachuun dirqama waaqatti kenname miti.</p>
+	<p>2. Atis ni dandeessaa, kahii gahee kee bahadhu.</p> 
+	<p>3. Waanti gaariin karaa salphaan gonkumaa argamuu hin danda'u.</p>
+	<p>4. Milkaa'insi harka namaa keessaa miti kan argamu.</p>
+	<p>5. Yoo nama abdii hin kutanne taate guyyaan boritti aanee dhufu siif bareedaadha.</p>
+	<p>6. Kaleessi yoo darbe, har'i kankeeti. Kanaaf kunuunfadhu.</p>
+	<p>7. Waanti kufee lafatti hafu waanta lubbuun keessaa bahe qofadha.</p>
+</h3>
+</p>` },
+
+            { title: "Boqonnaa 2", content: `<h2>BOQONNAA 2: KARICHA</h2>
+            <p>Bakka kaateefi bakka itti adeema jirtu gidduu bakkeewwan heedduun jiraachuun dirqama. Akkuma kaatetti qilleensaan bakka yaadde sana gahuus hin dandeessu. Sababni isaa gaarri, galaanni, lafti diriiraan, bosonni, harawwaniifi warreen kana fakkaatan jiraachuu danda'u.  Warreen kana fa'a hunda kuttee keessa darbuufis karaan jiraachuun dirqama. Karaa malee immoo deemsi hin tolu. Karaan/daandiin agarsiistuudha jechuudha.</p>
+<p>Karaanis wantoota irra adeemuuf nama rakkisan heedduun guutamaadha. Akka fakkeenyaatti yoon siif kaasuu yaale, karaan, riqicha, dhoqqee/laaqii, qoreewwan adda addaa, dhagaawwan fa'a kan ofirraa qabuudha. Kana hunda dandammattee deemsakee itti fufuuf garuu gahumsikee murteessaadha.  Karaa walxaxaa kana qaxxaamurtee karra kee bira gahuuf haaldureewwan armaan gadii qabaachuun gaariidha.</p>
+
+<h3>Jaalala</h3> 
+<p>Jaalalli jireenya dhala namaa keessatti iddoo guddaa qaba. Maddi Jaalalaa waaqa isa lafa ati irra jiraattuufi si'iin uumeedha. Yoo waaqa jaal'atte, ofii kee ni jaal'atta. Yoo ofiikee jaal'atte, hiriyoota keefi uumama si cina jiraan hundumaaf jaalala gahaa ni qabaatta. Kana hundaaf garaa qabannaan immoo duwwaakee irratti carraaqxee milkoofta. Garaan jaalalaa sikeessa hinjiru taanaan garuu hammamuu qabaadhu, hammamuu beekaas ogeessas ta'i milkooftee gammachuun hin jiru. Kana jechuun gammachuun milkaa'inaan alaa hinjiru jechuudha.</p> 
+<p>Manni jaalalli keessa hinjirre akka mana utubaa malee dhaabatee raafamuuti. Manichi meeshaalee gati jabeessa addunyaa kanaaf barbaachisan yoo ofkeessaa qabaatellee ofiisaa amanee bu'uura irra dhaabate akkuma hinqabne maatiin jaalala ofkeessaa hinqabne hammam maatii guddaa yoo rahe, hammamis beekamaa yoo tahe ofitti gammadee waliisaa gammachiisee jireenya gaarii jiraachuu hindanda'u.</p>
+<h3>Amanamummaa</h3>
+<p>Gahumsa gaarii arguuf ka'umsi gaarii tahuu qaba. Kunimmoo amanamummaa irraa kan maddeedha. Waanta hojjettu hundumaatti amanamummaa qabaadhu. Amanamuu jechuun waaqeffamuu jechuu osoo hin taane isa qaban gadhiisuu diduu jechuudha. Harki kee qaqqabatee waan tokko hojjechuu ni danda'a, gurrikee siif dhagahee dhalootaaf dhageettii tahuu ni danda'a, miilli kee deemee bakka yaadde sana inuma gaha, sammuun kee yaadee karoorsee galmati yaadde salphaatti si dhaqqabsiisa. Kanaaf dandeettii keefi kan nama biraattis amani.</p>
+<p>Warri konfiwushiyaanizimii akkas jedhu "Do not Do to Others What you Do Not Want Done to You" "Waanta akka siif hojjetamu hin barbaanne nama kan biraaf hin hojjetiin" kan jedhuudha. Hojii keerratti amanamaa ta'i. Akkuma lubbuukee eeggattu, kan warra sifakkaataniis eegi. Sanabni isaa deemsarra jirta waan taheef waan karicharratti simudatu hin beektuutii.</p>
+<p>Biyyatu sitti kenname yoo ta'e abbaan biyyaa sirkaa fuudhuuf yeroo dhufutti akka gara itti gortu hin wallaalleef lubbuu baay'ee karaatti hin hambisiin. Galaa dhalootaaf galfata sirka jiru abbaadhuma argite hin nyaachisiin sababni isaa, abbaan dhaloota sigaafachuu danda'a waan ta'eef.  Aangoo sitti kennameen waanjoo dhalootarra hin kaa'iin. Biyya sitti kennameef dhaloota biyyee hin nyaachisiin abbaan biyyaa dhufa hin ooluu. Amanamummaan wiirtuu (central process) mo'ichaati.</p> 
+<p>Dhaloonni amanamummaa of-keessaa qabu- yoomiyyuu mo'amee hin beeku. Amanamummaan jireenya kee keessa jiraannaan leenci hoolaa yoo siifta'u, abiddi immoo bishaan siif ta'a. Egaa walumaa galatti, amanamummaan karaa kee qulqulluu ati irra adeemtee karra kee saaqqattuudha.</p>
+<h3>Waan qaban sirnaan qabachuu</h3>
+<p>Qabeenyi wanta ati waan adda tahe ittiin oomishuuf itti gargaaramtuudha. Toorri qabeenya dinagdee kan eegalummoo qarshii lakka'amuu danda'u qofa isoo hin taane, Lafa, humna namaa (yeroo hojjetaa), Mi'oota (kanneen akka maashinaa, gamoowwanii fi mi'awwan dhala namaan kalaqaman kanneen biroo), fi dandeettii dhala namaa irraati. 
+Milkaa'ina keef dirqama mi'a gati-jebeessa kan akka warqii, meetii, diyaamondii fi warreen biroo hin eegiin. Yoo irratti hojjechuuf gahumsa qabaatte mi'oonni gati-jabeessa ta'an kunniin lafa ati irra jiraattu kana keessaa kan argaman tahuus hubadhu.</p> 
+<p>Nama sadiitu ture jedhama. Sadanuu daldaltootadha. Jireenya isaanii fooyyeffachuuf bakka jireenya isaanii gadhiisanii akka biyyoota adda addaarra naanna'anii milkaa'aniif waliin murteeffatan. Wal hin shaarru, walirratti hin kaanu, walis hin jibbinu; Kanaaf waliin jiraanna waliifis jiraanna jedhanii hirbuu waliif seenan.</p> 
+<p>Mi'oota daldala isaaniif isaan barbaachisan mara erga qopheeffaaniin booda deemsa isaanii tokko jedhanii eegalan. Namichi inni tokko yeroo hunda hojiisaatti waan gammaduuf bu'aan inni argatu kan warra lameenii caallaan qofaatti adda of-baasanii gungummii eegalan. "Akkamitti nucaale? nuti eenyuu gadi akkasaatti milkaa'uu kan dadhabne?"" jedhanii dubasaan dubbii eegalan.</p> <p>Inumaayyuummoo bu'aan namichi sun argatu kan duraaniirra dachaan dabaluu eegallaan bu'aa argaturraa nyaata isaaniif kan barbaachisu baasii toko tokko gargaaruu eegale. ''Hirbuu waliif galle hin dagatinaa anis hin dagadhu obboloota ko'' jechaa daran hojii isaa kanatti jabaachaa dhufe.</p> 
+<p>Jarri garuu waadaa duraan waliif galan dagatanii lafa qotanii lafee hiriyaa isaanii itti hawwaaluuf bu'anii ba'anii haala mijeeffachuuf qophii isaanii xumuran. Ji'oota muraasaan booda osoo waliin adeemaa jiranii boolla bishaanii(biirii) kan harka namaan qotame arginaan qabeenya hiriyaan isaanii kuufate hunda erga harkaa fudhataniin booda hidhanii(xaxanii) boollicha bishaanii meetira 30 gadi fagaatu sana keessatti darbatan.  Akka carraa tahee yeroo bonaa waan tureef boollichi bishaniin guutuu hin turre.</p> 
+<p>Bishaan dhugaatiif oolu muraasa ofkeessaa qabaatus jallisaa dhoqqee laafaa kan baay'ee nama hin miine ture.  Qabeenya isaa erga hirataniin booda gara biyya isaaniitti deebi'an. Yaaliin isaanii ajjeesuuf ture. Garuu lafti garaa laaftee lubbuu namichaa oolchite. Maaltu beeka yoona "maddikee anadha, animmoo biyyoodha; Kanaaf akka hiriyootakee sanaa garaa sitti hin jabaadhu; Ani dabarsee sinkennu jechuu hin hafne boollattiin. </p>
+<p>Boolla bishaanichaa keessa taahee waa'ee hiriyootasaa kanaa dhiphachuu eegale. ''Yoona maal ta'u laata? yaa Waaqa koo ati iddoosan deemanitti isaan gargaari' jedhee kadhataaf. Bitaaf mirgasaa ilaalus falli hin jiru. Yaaduuf yaadda'uun alatti tattaaffii gochuuf humna hin qabu ture.</p> <p>Qorri boolicha keessaammoo hammaan oli-akka malee qorra jechuudha. Beela hamaarraan kan ka'es ciree, laaqanniifi hirbaanni isaas biyyee girgiddaa boollichaa ta'eera. 
+Bita ilaallaan kan argamu girgiddaa boollicha bishaaniif qotamee qofatu muldhata ture. Mirga ilaallaanis akkasuma. Oli ilaallaan dirree boollichaa ol jiru arguunis samii gararraa/gubbaa itti ta'e.</p> <p>Kallattii sadiin furmaata argachuuf abdiin dhadhaa abidda buute fakkaattus kallattii arfaffaa ittiin daandii argatu barbaaduu eegale. Yaalii yeroo dheeraan booda, Carraan xumuraas gadi ilaaluu ture. Ji'oota muraasa booda garuu waan hin yaadamnetu tahe.</p> <p>Xiqqoo gadi jedhee miillasaa jala wayita ilaalu dhagaa kan fakkaatu waanta guddaa calaqqisuufi ifu tokko arge. 
+Baay'ee ajaa'ibsiifate. Dubbachuu hin dandeenye. Di'aamondii-dhagaa gati-jabeessa addunyaati. Lafee(mi'a) gati-jabeessa Lafa(boolla) keessaa argame. Akka malee gammaduurraan kan ka'e bifti isaa jijjiiramuu eegale. Bakki isaa daandii cina waan tureef daldaltoonni wayita dheebotan qalqalloo (baaftuu bishaan boollaa) qaban fayyadamanii bishaan waraabbachuuf yeroo tokko tokko gara boollichaa ni deemu.</p> 
+<p>Namichi boollicha bishaani keessa taa'ee namoota bishaan dhugaatii baafachuuf qalqalloo boolla bishaanichaatti gadi ergan lama arge. Baay'ee gammade. Jarreen sunis sagalee qufaa namaa boollicha keessaa dhagaa'amu hubannaan nama ta'uusaa baran. Namichi sagaleesaa olkaasee ''maaloo......maaloo.... naaf dirmadhaa obbolootako'' jennaan dursee akkanni bishaan waraabuuf gaafatan. Bishaan waraabee ol-erginaaniif gammadanii boollicha bishaanii keessaa wadaroon harkisanii isa baasan. Dhagaa gati jabeessa sana kiisa keessa dhokfatee waanta irra gahe mara isaanitti hime. Baay'ee gaddan.</p> 
+<p>Uffata barbaachisu kennaniifii gara manasaatti akka deebu'uuf geggeessan. Naannoo isaatti erga deebi'een booda hojii tokko tokko hojjetee qarshii muraasa kuufannaan, dhagaa gati-jabeessa argate sana gurguruun warshaa uffataa naannoo jiraatutti hundeesse. Waanti nama gaddisiisu garuu Hojjettota inni qacare keessaa tokko dur inaaffaan boolla sanatti akkanni darbatamuuf tarkaanfii kan fudhate ture. Hiriyoota isaa miidhaa hamaaf isa saaxilan sanatti amala addaa osoo hin agarsiisiin hawaasa naannoo isaa biratti nama hinjifannoo olaanaa galmeesseedha jedhama.</p>
+<p>Yaa dubbisaa gaarii ko calliseedhuma seenaa siif tarreessaa hin oolle. Waaee lafa irra jiraattuu hubannaa gahaa akkati qabaattuufani.  Oromoon waa'ee Handhuurasaa Finfinnee yookaan immoo lafa abbaasaa duriin walqabsiisee waan tokko dubbataa ture. Innis ''Lafti keenya Lafee keenya'' kan jedhuudha. Kun dhugaa jirtuudha. Lafikee yoomiyyuu lafee keeti. Egaa laftikee lafee kee tahuu isaa mirkaneessuuf lafa kee irratti jaalalaafi amanamummaa qabaadhuuti hojjedhu.</p> 
+<p>Qabeenya lafa keerraa qabdu immoo sirnaan yoo qabatte karaan ati qabattee jirtu sirriidha. Karicharra imaltee karrichatti immoo seenuu akka dandeessu asumaan si hubachiisuun barbaada. Akka nama sammuu gahaa qabu tokkootti wayita yaaddu karaan kee maal fakkaata? Karaa sirrii irran jira jettee yaadaa jirtaa? Moo Karaakee miidhagfachuuf dhalootatti karaa cufaa jirta? Dhalootaaf jaalala qabdaa? Amanamummaanoo si biratti maal fakkaata? Deebii sumaafan dhiisa.</p> 
+<p>Lafakee eeggattee irratti hin jijjiiramne taanaan Lafeen kees eegumsa hin argatu. Sababni isaa lafarra jiraatta, lafarra deemta, lafarratti ijaarta, lafarras jiraatta. Kanaaf ilaalchi ati lafakeef qabdu olaanaa tahuu qaba. Qabeenyi keenya daangaa qabaatus, fedhii keenya daangaa hin qabne guuttachuuf akkaataan itti fayyadama keenyaa murteessaadha. Fedhiif barbaacha keenya guyyuu geggeeffachuu danda'uuf giddu galeessaan waanti nuti gochuu qabnu inni guddaan filannoo qabeenya keenyaati.</p>
+<h3>Qabeenya Filachuu</h3>
+<p>=Choices Are Necessary Because Resources are Scarce.You can't always get what you want(Yaad-riimee Dinagdee)</p>
+<p>Filachuun dirqamadha. Sababni isaa qabeenyis daanga'a''dha waan taheef. Tiyooramii dinagdee keessa wantoota yeroo hundumaa dhugaa ta'an sadiitu jiru. Isaanis:-</p> 
+	<p>1. Fedhiin namaa daangaa hin qabu,</p>
+	<p>2. Qabeenyi namaa daangaa qaba fi</p>
+	<p>3. Qabeenyi filannoodhaan kan jedhuudha.</p>
+<p>Namni kamiyyuu argama guddaa tokko irratti mana sadarkaasaa eeggate ijaarrachuuf konkolaataa miidhagaa tokko ykn lama akkasumas hoteela gaarii keessatti bashannanuufi warreen kana fakkaatan hunda yeroo tokkotti argachuuf fedhii daangaa hinqabne qabaachuu mala. Garuu ta'us isa kana biyyoonni Akka Ameriikaa sadarkaa guddina dinagdee isaaniin addunyaa kana bitanii jiraniyyuu yeroo tokkotti guuttachuuf carraa hin arganne. Kanaaf furmaanni isaanii filanoo wantootaa irratti bu'uureffachuu ta'e. Kanumaafuu daangaan galii kee waanta ati qabaachuuf fedhii qabdu irratti dhiibbaa fuggusoo uumuu akka hin dandeenye yaada kana irratti   akka naaf hubattu hin shakku.</p>
+<h3>BEEKUMSA</h3>
+<p>Meeshaawwan gurguddaa Addunyaa kana jijjiiran keessaa inni ijooniif guddaan Beekumsadha.  Beekumsi jireenyikee dhuunfaatti akka boqotuufi haara'u godha. Caalaattimmoo, dhala namaa bineessarraa adda kan baasuudha. Dhalli Namaa beekumsaan jireenya dhuunfaasaa gargaaruufi tajaajiluu danda'a. Beekumsi nyaata sammuuti.  kiisii sammuu keetii keessaa beekumsa giraamii tokko yoo qabaatte, hojii kiilogiraamii kuma tokkoo ol hojjechuu dandeessa.</p>   
+<h2>Beekumsi  Siif Maali?</h2>
+<h3>Beekumsi Qabeenya.</h3>
+<p>Addunyaa kanarra beekumsi maaliif akka isaan gargaaru namoonni beekan lakkoofsaan muraasa. Namoonni baratan martinuu beekaa tahuu baatanis, namoonni beekaa ta'an martinuu barachuun  isaani dhugaadha. Kunimmo hima hin shaakalamne fakkaatus dhugaa jiruudha. Kanaaf baay'ee barachuu, baay'ee dubbachuu, fi baay'ee gorsuun yookiin ajajuun kee baay'ee beekuukee hi  ibsu. Qabeenya guddaa beekumsa jedhamu yoo qabaatte garuu, konkolaataa oofuuf dandeettii niqabaatta, xiyyaarallee balaliisuu dandeessa. Waanta salphaatti hubatamuu hin dandeenye furuuf hibboo dhokataa hiikuunis beekumsaani. Kanaafuu waanta xiqqaas guddaas hojjechuuf beekumsatu sigargaara.</p>
+<p>Beekumsa qabda taanaan maximadii walfakkaatu keessatti akka hin kufneef ofiikee eeggachuufis dandeettii niqabaatta. Egaa beekumsa bitachuummoo hin dandeessu, cirtees kiisa kaa'attee deemuu hin dandeessu. Beekumsi dhaalaan hin argamu. Maaliiniree? Barnootaafi kufaatiidhaan argama. Keessumatti barattoonni ofeeggannoo cimaa gochuun gaariidha. Beekumsi qormaata darbuu qofaan kan hin madaalamu miti.</p> 
+<p>Haxereraa irraa waraabdee qormaata qoramte dhibbantaa sagaltamii sagal deebistus, kun milkaa'uu kee hin ibsu. Kufaatii keessaayyuu isa gadaanaadha. "Uffanni ergisaa sirraa beeksisaa galtu ni geessita" jedha Oromoon. Sababni isaa, har'a qormaata hattee dabarteetta ta'a. Borimmoo biyyatu sitti kennama. Iftaan immoo biyya gurgurta. Dhaloonni sirratti gunguma. Kun immoo qormaata deebii dhabe sitti ta'a.</p> 
+<h3>Beekumsi Aangoodha</h3>
+<p>Beekumsi aangoo ta'uu isaa yeroo mara ni dhageenya. Kun immoo yeroo hunda dhugaa ta'uu dhiisuu danda'a. Sababni isaa Beekumsi odeeffannoodha; Beekumsi hojiitti jijjiirame ammoo Ogummaa ta'uun isaa daran beekumsi aangoo ta'uu mirkaneessa. Garaagarummaan namoota dubbisuu hin dandeenyeefi utuu dubbisuu danda'anii hin dubbifne maali? Egaa barnoonni akkuma nyaataati.</p> <p>Innis hangati nyaatte qofa osoo hin taane, hanga nyaatamee dhiiga keetti dabalamee  sirna marsaa jireenya kee itti fufsiiseedha. Kanaaf beekumsi dandeettii aangooti; Ogummaan ammoo beekumsa hojiitti jijjiirame yookiin aangoo isa dhugaadha. Barnoonni immoo wantoota hedduu calaqqisiisuu danda'a. Innis waraqaa yookiin tuqaawwan ati galmeessite qofa osoo hin taane,</p>
+	<p>i. Cimina kee misoomsuu</p>
+	<p>ii. Naamusa dhuunfaa kee barachuu</p>
+	<p>iii. Dandeettii dhaggeeffannaa kee cimsachuu</p>
+	<p>iv. Barnootaaf fedhii qabdu dagaagfachuu</p>
+
+<h4>=Barnooti mi'aadha jettee yaadda taanaan, Doofummaa shaakali.
+ (Derek Bok)</h4>
+<p>Akkuman olitti siif cuqaasuuf yaale, Beekumsi, mi'a gati jabeessa bittaan hin argamneedha. Bu'aa dandeetti hojiikee gaariif kaffaltiin ati argattu qarshii shallagamuun olitti beekumsati argattuudha. Kanaafuu dhagichi gati jabeessi beekumsa jedhamu sun isa ati jireenyakee ittiin jijjiirrattee milkaa'ina kee gonfattuufi  Aangoofi kabaja guddaa  ittiin argattuudha.</p>
+<p>Hundaan olittimmoo, Beekumsi dhalli namaa jireenya keessatti badhaadhummaa gahaa argachuuf kan gargaaruudha. Biyyootaafis badhaadhummaafi nagaan akka uumamuuf itti gaafatamaan beekumsadha. Milkaa'insaafis balbala banuun tukkummaa biyyoota gidduu jiru cimsa.</p> 
+ <h3>Beekumsi Badhaasa</h3>
+<p>Beekumsi cimina hojiikee irraan kan kahe badhaasa ati jireenya keef gonfatteedha. Kanaaf yoomiyyuu sirraa hin mulqamu. Beekumsa keetiin hojjechuu wayita dandeessu, Hojiikeen immoo beekaa ta'uu dandeessa. Beekumsi lakkaa'amee kiisii keessa kan taa'u, ukkaamamee (saamsamee) saanduqa  meeshaa keessa kan  taa'u, faayamees lafa kan kaa'amu osoo hin taane, hijiitti kan jijjiiramuudha. Beekumsi hojiitti jijjiirame immoo  jireenyadha. Jireenyi immoo beekamtii keeti.</p>
+<h2>Qabxiiwwan ijoo Boqonnichaa</h2>
+	<h3><p>Maddi Jaalalaa waaqa isa  lafa ati irra jiraattuufi si'iin uumeedha.</p></h3> 
+	<h3><p>Manni jaalalli keessa hinjirre akka mana utubaa malee dhaabatee raafamuuti.</p></h3> 
+	<h3><p>Waanta akka siif hojjetamu hin barbaanne nama kan biraaf hin hojjetiin.</p></h3>
+	<h3><p>Amanamummaan jireenya kee keessa jiraannaan leenci hoolaa yoo siifta'u, abiddi immoo bishaan siif ta'a.</p></h3>
+	<h3><p>Qabeenyi wanta ati waan adda tahe ittiin oomishuuf itti gargaaramtuudha.</p></h3>
+	<h3><p>Lafakee eeggattee irratti hin jijjiiramne taanaan Lafeen kees eegumsa hin argatu.</p></h3>
+	<h3><p>kiisii sammuu keetii keessaa beekumsa giraamii tokko yoo qabaatte, hojii kiilogiraamii kuma tokkoo ol hojjechuu dandeessa.</p></h3> 
+	<h3><p>Beekumsakeen hojjechuu wayita dandeessu, Hojiikeen immoo beekaa ta'uu  dandeessa.</p></h3> 
+
+</p>` },
+            { title: "Boqonnaa 3", content: `<h2>BOQONNAA 3: BEEKUMSA</h2>
+            <p>Maddi beekumsaa inni guddaan barnootadha. Barnooti immoo daree galanii barachuu qofa osoo hin taane hojjechuu keessaas ni argama. Barnoonni akkuma imalaa bu'aabayii heedduu qaba. Hiddi barnootaa hadhaawaa yoo ta'es iji saa mi'aawaadha. Ittoon biddeenaan nyaatamuuf soogidda yookiin ashaboo yoo dhabe akkuma  hin mi'oofne, beekumsi barnootaan alaa bu'aa hin qabu.</p> 
+<p>Madda beekumsaa jechuun karaalee namni tokko ittiin beekumsa gonfachuu danda'u jechuudha. Beekumsa jechuun immoo dandeettii, waanta dhugaa, yookiin odeeffannoowwan karaa muuxannoowwan adda addaas ta'e barnootaan dhala namaan gonfatamaniidha. Beekumsi karaa baay'een daddarbuu danda'a. Fakkeenyaaf:karaa miidiyaawwan adda addaa, karaa barruuleefi odeeffannoowwan garaa garaa, karaalee hawaasaa fi warreen kan fakkaatan.</p>
+<p>Baay'ee barachuu qofti beekumsa baay'ee nama hin gonfachiisu. Kana jechuun, Beekumsa argachuuf barnoonni murteessaadha ta'us, quubsaa miti.  Baratanii akkuma yaalii geggeessan, yaalii baay'ee keessaas barnoota heedduutu argama. Baratanii akkuma qormaatawwan heedduutti dhiyaatan Qormaatawwan heedduu keessaas barnoonni argamu isa idileen baratame kan caaluudha.  Egaa, Burqaawwan beekumsaati jedhee hamman hubadhe  muuxannoo siif qooduuf jedheetan hamma kana dubbiin afaan sigossee. Na hin nuffiin!</p> 
+<h3>Barnoota</h3>
+<p>Burqaan beekumsaa hangafni barnoota. Osoo hin baratiin qormaata fudhattee beektaa? Kun sammuu namaa kan burjaajessuudha. Barnoota hin arganne taanaan seenaan namni afaaniin sitti odeessu hammam akkanni sammuu si jeequ ni beekta jedheen yaada. Qoramanii darbuuf barnoonni iddoo guddaa qabaachuun alattis qulqullina firii qormaata keetiif gahee guddaa kan taphatuudha. Atihoo? Barnoota akkamitti addeessita? Ani akkasittan ibsa. Xiqqoo gurra naaf ergisi yaadanan addunyaa barnootaarra si naannessaa.</p><br>
+<p>Bu'aansaa kanadha<br>
+Sammuu kan qaroomsu<br>
+Kan kufeyyuu kaasee<br>
+Lammii kan misoomsu<br>
+Dadhabaa jabeessee<br>
+Hiyyeessas duroomsee<br>
+Doofummaa balleessee<br>
+Guddinas dhugoomsee<br>
+Maqaasaa yoo waaman<br> 
+salphaama fakkaata<br>
+Akka yaada kootti<br>
+Ibsuuf natti ulfaata<br>
+Barnoota maqaansaa<br>
+Rasaasa dhalootaa<br>
+Jijjiirama addunyaa<br> 
+Kan baraaf barootaa<br>
+Nyaata saayinsistii<br>
+Kan warra Doktoorii<br>
+Madda Filoosoofiif<br>
+Kan Piroofeeserii<br>
+Gingilchaa dhalootaa<br> 
+Soortuu sammuu namaa<br>
+Ibsituu eenyummaaf<br>
+Kallattii uumamaa<br>
+Barnoonni dandiidha<br>
+Daandii qaroominaa<br>
+Bantuu qalbii naamaaf<br>
+Karaa milkaa'inaa<br></p>
+<p>Barnoonni kuusaa seenaafi aadaa kee tahuun alattis milkaa'ina kee egereef shoora olaanaadha kan taphatuudha. Egaa Barnoota yeroon siin jedhu immoo, isa daree barnootaa seenuuf dabtara, kitaabileefi qubeessaawwan halluu adda addaa bitannee qophoofnu sana qofa miti. Inni sun ji'a waxabajjii hiriyoonnii fi namoonni adda addaa harka walitti akka siif reeban qofaaf kan siqopheessu tahuu mala. Kunimmoo deemee deemee hannatti sigeessuu danda'a. Hatuun immoo safuu Oromoo cabsuudha.</p> 
+<p>Beekumsa argachuuf yeroo kamillee sammuun kee dheebotaa tahuu qaba. Gurri ati utuu gatii tokko itti hin baasiin waaqakee biraa argattemmoo daran beekumsaaf daandii qulqulluu tahuu qaba. 
+Ijikees waanta sitti tolu qofa ilaaluu osoo hin taane waanta ilaalamuu qabu mara akkati ilaaltuuf gaheesaa bahachuu qaba. Arranbikee abukaattoo kee qofa akka hin taane, akkasumas waanta gurra kee fi gurra namati jaal'attuutti tolu qofa dudubbachuuf hojiisaa idilee akka hin raawwanne.</p> 
+<p>Daa'imarraa barnootni argamu jiraachuu danda'a. Keessumaayyuu daa'imman yeroo ammaa kana addunyaa tekinooloojiin faayamtetti balbala saaqqatanii gadi bahaa jiran. Isaan waanuma gadameessa haadha isaanii keessatti shiboowwan elektiriikiitiin hidhamanii turan kan fakkaataniidha. Isaanis carraa isaanii tahee, barnoota siif qoodan waan qabaniif sibarsiisu, si bu'aarsus waan ta'eef, nan dursa jettee hin tuffatinii irraa baradhu.</p> 
+<p>Hawaasni ati keessa jiraattu barnootakee guyyaa guyyaaf iddoo olaanaa qabu. Hawaasni hayyootaafi maanguddoota heedduun guutamus, baraafi furguggee gad-jedhanii jala dabarsu jennaan afaan qabate malee beekumsaan faayamaadha. Kanaaf abbaakeef haadhakee akkasumas hayyoota irraa barachuuf sammuu kee banii eeggadhu. 
+<h3>Qormaata</h3>
+<p>Baratanii firii gaarii galmeessuuf qormaanni murteessaadha. Barnoota keessaa qormaata bareedaa yoo dhabde, Qormaata keessaa beekumsa bareedaa(gahaa) argatta. Carraan firii qormaata kee, kan ati barnoota kee irraa argattu dhibbantaa shantama(50%) yoo tahu, Carraan ati firii qorumsa kee keessaa beekumsa argattu immoo dhibbantaa dhibba(100%) ta'a.</p>
+<p>Qormaata qoramte marayyuu yoo kufte(jigde), dhibbantaan ati argattu duwwaa ta'a.  Kufuu kee irraa Beekumsa ati argattu garuu dhibbantaa dhibba ta'a. Kana jechuun milkaa'insi dhibbantaan sagaltamii sagal kan argamu kufaatii keessaati jechuudha. Waanta itti gammadde salphaatti dagachuu wayita dandeessu, waanta itti gaddite garuu hanga addunyaa kanarraa dabartutti hin dagattu.</p> 
+<p>Barata/Barattu, Qormaata kuftee aartee hin beektu? Daldala/Daldaltu nagadi walsirkaa nyaatee gadditee hinbeektuu? Qote nulaa, midhaan ati ija/firii irraa argachuuf facaafatte sana lolaan gaafa siduraa hare gadditee hin beektuu? Egaa nadhageessaa? Qoramuun darbuuf qofa osoo hin taane, kufaatii jalqabaa keessaa Beekumsa argachuufi. 
+Kufaatiin kee duraa sun badiikee miti. Sababni isaa Barnoonni jabduun achirraa argamti waan ta'eefi. Lammaffaa deebitee kuftee achumatti hafte ka'uuf abdii kutatteetta taanaan garuu badii keeti. Sababni isaa beekumsi ati kufaatii kee duraa irraa argattee turte ammas siwaliin deebi'ee kufeera waanta'eefi. Walumaa gaatti qormaanni ati kufaatii kee irraa argattu, madda beekumsaati. Inni kun miilkaa'ina jireenya keef si'eessituudha</p>
+<h3>Yaalii</h3>
+<p>Isa dhageesseen olitti inni ati ija keetiin argite ni caala. Isa ija keetiin argiterra immoo inni ati goote ni caala. Kunis dhagahuurra arguun ni caala; arguurra immoo gochuun ni caala. Aniif ati, lafti aduutti naannofti jennee hawaasa keessatti barsiisaa keenyarraa barannee jirra, garuu akka Maajelaanii fi hiriyoota isaa abdii horannee, dachee kanatti naannofnee yaalii nuti  geggeessine tokkoyyuu hin jiru. Haayidiroojiniifi Ooksijiniin bishaan ta'uu isaa barsiusaa keemistirii irraa akka gaariitti baranneerra garuu waanti nuti ofii keenyaan adda baafanne hanga ammaatti hin jiru. Bishaanuma boora'e mataasaa calalchiisuuf yaalii hin geggeessine.</p> 
+<p>Namoota waan kana hunda yaalanii kufaatii meeqaan nu dhaqqabsiisan qeequun alatti yaalii nuti tokko yookiin lama jennee eegalle hin jiru. Yaaliinis barnoota waliin hariiroo karaa lamaa qaba.</p> <p>Baratanii yaalii geggeessu, yaalii heedduu keessaa immoo barnoota argatu. Kuufamni milkaa'inaa barnoota yaalii keessaa argameen tilmaamama. Kufaatiin yaalii keessaa argamu kan qormaata keessaa argamuun wayita walbira qabamu baay'eedha. Burqaawwan beekumsaa yaalii keessaa argamanis kan qormaataa ni caalu. Kanaafuu barattee hin taa'iin. Isa baratte hojiitti jijjiiruuf carraaqi.</p> 
+<p>Dubbisaa/Dubbiftuu, maal baratte asirraa? Dubbistee Ofiikee askeessatti ilaalteettaa? Mee waanuma fedheefuu jabaadhu! Dammaquun sirraa eegama. Gatiin gurrakee meeqa akka tahe beektaa? Gatii guddaan akka itti bahee siif laatame hoo quba qabdaa? Gatiin sammuu kee tilmaamtee beektaa? Mee bineensotaafi namoota sammuun isaanii sirriitti hin dalagne naannoo keetii daawwadhu.</p> 
+<p>Waaqayyo baay'ee akka sijaallatuufi sicaalaatti siif yaadus tilmaamteettaa? Hangamiree isa kana sumaafan dhiisa. Halkan dukkana keessa wayita deemtu namni tirika(baatirii) wayita siif ibsu hangam akka gammaddu ni beekta mitii? Ijakee sana meeqaan bitatte? Meeshaawwan sitti kennaman kun gaaftokko abbaasaaf akka galanis asumaan akka hubachaa deemtun sitti hima.</p> 
+<p>Gurrikee waan gaarii dhagahee arrabni kee immoo dhalootatti waan gaarii akka dubbatuuf siif kennameera. Sammuun kees waan gaarii yaadee hubatee dhaloota hubachiisuuf, Ijikee isa ilaalee arge sana dhaloota agarsiisuuf siif kenname. Kun immoo itti gaafatamummaadha. Itti gaafatamummaanis galfatadha. Galfata hin nyaatiin-Galfata nyaachuun gatii nama kaffalchiisa waan ta'eef.</p> 
+
+<p>Walumaa galatti jireenyuma kee guutummaaf barnoonni bu'uura. Yoo baratte qoramte keessatti ofiikee ilaalta. Bu'aa qormaataafi barnoota keerraa argatteen immoo akka keessatti of-ilaaltuuf yaalii walirraa hin cinne gaggeessita. Yaaliikee walitti fufaa kanaanis kufaatii hedduu keessummeessuu dandaeessa garuu maddi beekumsakee dhibbantaan shantamaa ol kan argamu kufaatii kee keessati. Egaa barnoonni guddina dhuunfaa keef hariiroo daandii sirrii isa duraa waan ta'eef akkamitti barnoota gaarii jireenya keef argachuu akka dandeessu immoo qabxiiwwan mata-duree itti aanan jalatti siif eeraman bal'inaan dubbisi.</p>
+<h3>Haaldureewwan Barnootaaf  murteessoo ta'an</h3>
+<p>Jireenya dhala namaaf barnoonni murteessaadha. Keessumaayyuu biyyoota guddachaa jiran kan akka biyya keenyaa kanaaf barnoota qulqullina gahaa qabu argachuun dirqamadha. Yeroon isaa ulfaataadha. Sababni isaa yeroo itti dhaloonni ammaa utuu hin baratiin isa barate fakkaatee, biyya burjaajessaa jiruudha. Barataan illee yeroo itti barsiisaa isaan qixxaatee baraataafi barsiisaa adda baafachuun nama rakkisaa jiruudha.</p> 
+<p>Walumaa galatti dhaloonni jaarraa 21ffaa biyya keenyaa kun dhaloota barnoonni sammuutti ulfaatu, dhaloota utuu baratee mana barumsaa sadarkaa tokkoffaa keessaa hin bahiin araadni adda addaa( fkn tapha puulii, dhugaatiiwwan adda addaa Caatiifi Sigaaraan) sammuu adoocheedha.</p> 
+<p>Dhaloonni ammaa barnootaaf fedhii hin qabu. Addunyattii immoo barnoota qofatu sochoosaa jira.  Waan tokko barachuuf fedhiin hin jiru taanaan namni osoo waanuma tokkoyyuu hin baratiin hafa. Haaldureewwan barnoota irratti dhiibbaa fidanis muraasni kan armaan gadiiti.</p> 
+<p>1. Kaka'umsa</p> <p>Kaka'umsi barataa galma ga'iinsa barnootaaf murteessaadha. Kaka'umsi barataa cimaan, fedhii barnootaa cimaa ta'e argamsiisa. Yeroo fedhiin barachuu guddatu, barataan si'aa'ina gonfata. Atis dandeettii uumamaa hangamii akka qabdu tilmaamteettaa? Xiyyaara hojjetanii balaliisuun kennaa uumamaa qofa akka hin taane beeki. 
+Osoo kennaa uumamaa qofa ta'eera ta'ee ta'ii jedhameetu hojjetama malee meeshaalee aluminiyeemii walitti suphuun hin barbaachisu ture. Inni guddaan kaka'umsi dandeettii kee adda baafachuu danda'uu keeti. Xiyyaaricha inuma hojjetta turte kaka'umsa  keetu hir'uu ta'e malee. Kanaaf karra keetti akka seentuuf beekumsi sibarbaachisa.</p> 
+<p>Hanga ammaattis addunyaa keenyarratti beekumsi gahaan hin argamne. Bakkeewwan deemtutti beekumsa gonfattee jireenya milkaa'aa jiraachuuf idileen,  beektota irraa, hawaasa irraa, kufaatii kee irraa barachuuf kaka'umsa qabaadhuun dhaamsa kooti.</p>
+<p>2. Gahumsa:</p>  <p>Baratanii galma barbaadaniifi firii gaarii argamsiisuuf bilchina barbaachisa. Guddinni qaamaa barnootaaf iddoo olaanaa qaba. Daa'imni barnoota eegaluun dura guddinni qaamaafi jijjiiramni amalaa saffisuu qaba. Karoora keetti fiixaan ba'iinsa gaarii argachuuf gahumsi dhuunfaa kee murteessaadha. Gahumsa dhuunfaa immoo maatiirraa, qomoo/warra irraa kan dhaalan osoo hin taane jijjiirama dhuunfaan kan argataniidha. Maatiifi gosa ofiirraa dhaalaan kan argamu qabeenyaafi amala gadhee qofa. Jijjiiramni dhuunfaas barnoota idilee qofaan osoo hin taane al-idileen sadarkaa guddinaa keessa argamuu danda'a.</p>
+<p>Ati dheedhii taanaan karoorri kee bilchaachuu hin danda'u. Waanti dheedhiin wayita nyaatamu akkuma garaa nama dhukkubsu, bilchina dhuunfaa hin qabdu taanaan karoorri kee galma gahuu utuu hin taane mataa dhukkubbii siif ta'a. Kun immoo yeroo hunda jireemya kee akkati jibbaa jiraattuuf karaa bana. Quba tokko namatti qabuutti quba sadii akka ofitti hin qabne. Barnoota qulqulluun beekumsa gonfattee milkaa'ina keen wal arguuf gahumsa kee mirkaneeffadhu. 
+Haala fayyummaa :  Fayyaan jijjiirama jireenya nama tokkoof iddoo olaanaa qaba. Barataan barnoota gahumsa qabu argachuuf fayyaa gaarii qabaachuu qaba.</p> 
+<p>Fakkeenyaaf, hanqinni miiraa,  nyaata madaalamaafi hirribaa, akkasumas dadhabinni qaamaa si'aa'ina barachuu barataa irratti dhiibbaa uumuu danda'a. 'Atis barataadha'? jedhee osoon si gaafadhee deebii baay'een argachuu danda'a. Deebiin siif deebisu garuu tokko qofa. Innis, eeyyee ati ammayyuu barumsakee hin xumuranne-barataa/barattuudha jechuu kooti. Digirii meeqa walirratti baachuun baradheera nama hin jechisiisu. Dhiifama! Baratteetta, akkaataa falaasama kiyyaati malee. Baratteetta kan siin jedhamu wayita ati suufii fi karabaataa bareedaa uffattee nama duratti baatee dubbii jajjabaa dubbattu osoo hin taane, gaafati waanta baratte dhugummaasaa dhalootaaf ifoomsiteedha.</p>
+<p>Gaafa ati miindeffamtee ji'aan qarshii argachuu eegalte osoo hin taane, gaafa ati miidhamtee dhalootaaf dhugaa dubbatteedha. Dokteerii ta'uu dandeessa ta'a, Pirofeesera ta'uu dandeessa ta'a, Dokteeris ta'i Pirofeeserii ta'uun kee barachuu kee nuuf hin ibsu. Sababni isaa maqaa kanaan beekamuuf namoonni hedduun qarshiin akka caalbaasiitti waldorgomaa jiru. Dhaloonni jijjiirama barbaadus hojii inni hojjetee dhalootaaf galaase malee maqicha Dokteeraafi pirofeeserii jedhu sanaaf kabaja laachaa hin jiru.</p> 
+<p>Oromoonis dubbii xumuruuf, nama maqaan isaa fi hojiin yookiin amalli isaa walmadaaluufii dide wayita qeequ "Maqaan ayyaana hin ta'u" jedha. Kunimmoo dhugaadhuma jiruudha. Kanaafuu maal fakkaatta? Ijikee, harkikee, arrabni kee, gurri kee fayyaadha? Waanta baratteen hanga ammaatti galaan ati dhalootaaf galaasuuf qophoofte maal maal fa'atu jira? Hin jiru taanaan atumtiyyuu barnoota dabalataa waan sibarbaachisuuf fayyummaa sammuu, miiraafi qalbiikee mirkaneeffadhu.</p>
+<p>3. Nageenyummaa Xiin-sammuu</p> 
+<p>Haalonni xiin-sammuu dhuunfaa murteessan kanneen akka: dhiphina, sodaa, yaaddoo qofummaa fi gadaantummaan yaadaa salphaatti barnoota hubuu danda'a. Kanaafuu, Barattee milkaa'uuf dirqamaan ofkabajuu, ofiikeetti amanuufi ofbulchuu danda'uu qabda. Dheerina umurii keefis gaarii waan hin taaneef dhiphina hin baay'isiin</p> 
+<p>4. Hojii gaariif haala mijataa</p>
+<p>Dhabamuu/argamuu qilleensa gaarii, ifa, bakka mijataa, tempireechara giddu-galeessiifi bakki jeequmsa hin qabne si'aa'ina barnootaaf shoora olaanaa taphata. Haalota kana mijeeffachuuf qaama biraa eeguun sirra hin jiru.</p> 
+<p>5. Muuxannoo duraan ture:</p> <p>Muuxannoon duraan ture barnoota itti aanuuf murteessaadha. Haalli gaariin barnootaa kan muuxannoo duraa irraa argames barnoota itti aanutti darbuu qaba.</p> 
+<p>6. Dheerina Wayitii Hojii:</p> <p>Wayitiin barnootaa baay'ee dheerachuus gabaabbachuus hin qabu. Hamma malee dheerachuun wayitii barnootaa dadhabbii qaamaa fida. Kunis fedhiin barachuu akka gadi buhu godha. Hamma malee xiqqachuun wayitii barnootaa immoo yaaliif gahumsa barbaadame hin argamsiisu. Kanaaf madaalawaa tahuu qaba.</p>
+<p>7. Barnoota adda citeefi qoqqoodame:</p> <p>Barnooti walitti fufiinsaan godhame, kan adda citeefi qoqqoodame caalaatti firii gaarii argamsiisa. Kanaaf, walitti fufiinsaan barsiisuufi barachuun gaarii ta'a. Wantoonnni armaan olitti siif balballooman haala barnoota gahaa argachuu keetiif murteessoodha. Hin tuffatiin, hamman hubadherraa hubannaa siif qooduuf jedheen hamma kana dubbadhee.</p> 
+<p>Egaa barnoota gahaa yoo argatte, beekumsa argatta, beekumsa wayita argattu immoo miirri jaalalaa sikeessatti ni dhalata. Jaalalli gahaan mana kee keessa yoo jiraate, qabeenyi dhabamus jiraatus jireenyi mijataa ta'a. Sababni isaa barnoota gaarii keessaa beekumsa, Jaalala, qabeenyaa fi wantoota kana fakkaatan hedduutu argamuu dandaa'a waan ta'eef. Qaphxii kana hubachuuf oduu durii kanan barsiisaa koo durii irraa dhagahen siyaadachiisa:</p>
+<p>Qabeenya, Beekumsaafi Jaalalatu keessummummaaf mana namicha tokkoo deeme jedhama. Dursee kan argame Jaalala, itti aansuun Qabeenya, dhuma irratti immoo Beekumsatu manicha deema ture. Jaalalli nagaa gaafatee mana namichaa erga seeneen booda iddoon keessummaa tokkoof barbaachisu laatameef.</p> 
+<p>Jireenyi manichaa amma waan  baay'ee jijjiirame fakkaateera. Sababni isaa manicha keessa gammachuun daangaa hin qabu. Miseensonni maatii Manichaas nagaa guutuu argataniiru. Haaluma kana keessa osoo isaan jiranii keessummaa kan biraan kan maqaan isaa qabeenya jedhamu alaa "warri kun" jedhee balbala manichaa rurrukutuu eegale.</p> 
+<p>Akkuma aadaa naannichaatti nagaa gaafatanii maqaasaa erga baraniin booda keessummeessuu yaalan. Maaqaan isaa guddaa waan itti fakkaateef dhagahanii gammadan. Teessuma duraan Jaalala irra teessisanii jiran irraa isa kaasanii namicha maqaan isaa qabeenya jedhameef guddaa hunda caalu itti fakkaate teessisuun Jaalala  teesuuma giddu galeessa gara gadiitti argamutti dabarsan. Akka duraanii tahuu baatus manichi xiqqoo tasgabbii qaba. Jaalallis teessuma isaa duraanii gadhiisee iddoo kan duraarra gadaanu argachuusaa kanatti waan gadde hinfakkaatu.</p> 
+<p>Tole jedhee, iddoodhuma kennameefirra taa'ee keessumsiifamuuf hayyamamaa ta'ee waanta isaan hojjetan taa'ee taajjabuu eegale jechuudha. Osoodhuma haasa'anii taphachaa jiranii keessummaan biraan maqaan isaa Beekumsa jedhamu kan waanti addunyaa kanaa harkasaa jiru alaan dhufee balbala kellaa manichaa rurrukute. "Oo" jedhanii gadi bahanii harka fuudhanii keessumsiisuuf maqaa gaafannaan baay'ee gammadan. Maqichi maqaa guddaa waan ta'eef mana isaaniitti argachuu dhugaa hin seene.</p>
+<p>Akka dansaatti gammadan. ''Ati maqaankee guddaa waan ta'eef iddoo gaarii siif kennuun qaba, kanaaf altokko Obbo Jaalalaa gara kanatti nuuf siqi" jedhee teessuma ija namaatti hin tolle kan afaan balbalaatti argamutti jaalala dabarsee Beekumsa iddoo jaalalaa teessise- abbaan manichaa.</p> 
+<p>Xiqqoo tasgabbiin uumamee yeroo muraasa booda qabeenyaafi beekumsa gidduutti waldhabdee guddaan kahe. ''Anii utuun'' jedhe beekumsi. ''Ani utuun dandeettii hamma kana guddaa tahe addunyaa irratti qabuu akkamitti keessumsiisaan keenya siif iddoo gaarii kennee anaaf immoo iddoo siin gadii laate? Lakki kun tahuu hin qabu akkas ta'a taanaan ani mana kana gadi lakkiseen deema. Haalichis natti hintolle'' jedhee xiqqoo hafuura baafate. 
+Qabeenyis darabee isaa afaan saaqqate. ''Ani boo jabaadha; Ana malee gammaduun hin jiru; Bakkan hin jirre beekumsis jaalallis hin jiran; Kanaaf amma sin tuma moo mana kanaa baata?'' jedhee harkasaarra uffata dachaafachuu eegale. Waldhabdee guddaan waan tureef manichi nagaa dhabeera.</p> 
+<p>Jeequmsiif waci sagalee akka malee dabalaa adeemnaan, maatiin namichaa naasuun haguugaman; fallis dhabameera. Sagaleen humnaan ol daballaan Jaalalli iddoo xiqqoo sanarraa kahee ''Na oofkalchaa waan xiqqoo tokkon dubbadhaa'' jedhe. Qubasaa namichatti qabee "Yaa namicho mana kee dursee kan seene ana ture; Ani seennaan qabeenyi iyyaafatee mana kee dhufe.</p>
+<p>Qabeenyi wayita manakee seene arginaan iddoof yaada naaf qabdu hir'istee iddoo gadaanaa naaf laatte; Inumaayyuummoo Beekumsa manakeetti arginaan iddoo sareen teessu naaf laatte; Hubadhu kun badii keeti; Ani jaalala hidhaa waan hundumaati; Ana malee nagaan, qabeenyi, beekumsi, gammachuuniifi aara galfiin akka hin jirre beeki; Kanatu mana keetti jeequmsa guddaa fide;  Kanaafis mannikee nagaa guutuu dhabe; Amma Hubatte''? jedhe. 
+Waanta hojjeteefi duraan yeroo jaalalli manasaa seene gammachuu jiru mara yaadatee namichi boo'iicha eegale. Calleensa xiqqaa duuba namichi jaalala iddoosaa duraaniitti deebisee jennaan iddoon qabeenyaafi beekumsaa baay'ee baldhatee lamaan isaanii waliigalanii akka walcina taa'an tahe.</p> 
+<p>Nagaa guddaan uumamnaan nyaanniif dhugaatiin barbaachisu dhihaate. Kolfaa taphataa mana namichaatti keessumummaan hafee maatii yeroo hundumaa ta'an jedhama. Argitee baacoo gabaabduu kanarraa ergaa barakee guutuu bakkati jiraattuuf hojjettutti sigargaaran akka hin dhabne shakkii hin qabu. Jaalalli akka kana. </p>
+<p>Manakee keessaa jaalalli iddoo qabaa? Iddoo akkamii laatteefii jirta. Atihoo jireenya kee keessaa jaalalli iddoo akkamii qaba? Jireenya gaarii jiraachaa jirta ta'uu danda'a, haadhota hiyyeessaaf harka qal'eeyyii naannoo kee jiraniif jaalala akkamii qabda?</p>
+<p>Maatii kee akka gaariitti kunuunfattee guddifataa jirta ta'uu mala, ollaa keetii obbo ebeluufi aadde ebeluun gara itti goraniif waan ittiin bulaniif bultoo isaanii boriif warra rakkataa jiraniif ilaalcha akkamii qabda? Utuu ollaa keetii hiyyeessi garaa hooqqataa buluu atiif maatiin kee quuftanii buluun gammachuu akkamii si gonfachiisa? 
+Egaa na dhaga'i! waanan sitti himun qabaa. Jaal'attus jibbitus,  Manni jaalala hinqabne nagaa hinqabu. Manni nagaa dhabes umurii dheeraa hin qabu. Haala hin beekamneen gaaf tokko jigee argamuun isaa hin oolu. Jaalalli immoo lafee dugdaa dhala namaati. Jaalalli jiraannaan nagaatu jira. Nagaan jiraannaan waldanda'anii jiraachuutu jira. Waldanda'anii jiraannaan immoo qabeenya xiqqaa fakkaatutu guddaa taha. Kana hundaan firiin argamnaan MILKAA'INA isa dhumaatu jira.</p> 
+<h2>Qabxiiwwan Ijoo Boqonnichaa</h2>
+	<p><h3>1. Hiddi barnootaa hadhaawaa yoo ta'es iji saa mi'aawaadha.<br>
+	2. Barnoota keessaa qormaata bareedaa yoo dhabde, Qormaata keessaa beekumsa bareedaa(gahaa) argatta.<br>
+	3. Kuufamni milkaa'inaa barnoota yaalii keessaa argameen tilmaamama.<br>
+	4. Bilchina dhuunfaa hin qabdu taanaan karoorri kee galma gahuu utuu hin taane mataa dhukkubbii siif ta'a.<br>
+	5. Jaalalli gahaan mana kee keessa yoo jiraate, qabeenyi dhabamus jiraatus jireenyi mijataa ta'a.</h3></p><br>
+
+</p>` },
+            { title: "Boqonnaa 4", content: `<h2>BOQONNAA 4: YEROO</h2>
+            <p>Jireenyi tooftaadha. Tooftichatti gargaaramuu baannan immoo gooftaa ta'uunsaa waan hafu natti hin fakkaatu. Tooftaa dhuunfaa keetiin jireenya qabuu yoo dandeesse immoo Gooftaa jireenyaa taata. Kanumaafuu, atis Jireenya milkaa'aa jiraachuuf tooftaawwan jireenyaa kanneen akka walitti dhufeenya namootaa uumuu, waa muldhisuu, yaada fooyya'aa qabaachuu, gorsa gaarii fudhachuu, yeroo haalaan fayyadamuu, akkaataa itti baratan hubachuu, dammaqinaan dhaggeeffachuu fi warreen kana fakkaatan qabaachuutu sibarbaachisa. Wantoonni ani armaan gaditti siif tarreesse qaamota tooftaawwan jireenyaa agarsiisan keessaa isaan barbaachisoodha.</p> 
+<h3>I. Xiinxalanii/fageessanii Yaaduu:</h3> <p>Kunis Sirriitti xiinxaluufi gadifageessanii yaaduu,  furmaata quubsaa kennuu, sababoota kahan hubachuufi dhuunfaan qorannaa geggeessuu danda'uu fa'a kan ibsuudha. Namni mul'ata qaba kan jedhamu dandeettii waa'ee fuula duraa achi fageessanii yaaduu yoo qabaate qofaadha.</p>
+
+<p>Isa gochuuf karoora baafattee yookaan fuulleffattee jirtu sanaan osoo wal hin argiin ofirkatti ilaaluu danda'uun milkaa'ina keef iddoo olaanaa qaba. 
+Isa gochuuf kaayyeffatte arguuf kaameraa bareedaa sammuu kee keessaa qabaadhu. Afaaniin dubbachuu dura sammuun xiinxaluun ni caala waan ta'eef. Keessumaayyuu jechoota arrabarraa maddisiisuun dura itti yaaduun murteessaadha. sababni isaa jechi arraba irraa faca'e biqilee damee yaafachuun isaa hin hafu waan ta'eef. Caalaattimmoo, rakkoo jireenyaa furuuf dandeettii yaaduu fooyyaa'aa fi akkaataa jireenya hawaasaaf sadarkaa odeeffannootti yaadota qorachuu danda'uu fi jireenya gaarii gonfachuu agarsiisa.</p>
+<h3>II. Ofitti Amanamummaa:</h3> <p>Ofitti amanamummaa jechuun Oftuulummaa jechuu miti. Dogoggorri yeroo ammaa jiru garuu 'ebelu ofitti amanamummaa qaba' yeroo jedhamu, oftuulummas ni fakkaata. Ofitti amanamummaan iftoominaafi ifa mul'ata ofiin deemuu yammuu ta'u, oftuulummaan immoo waan hin qabne akka waan qabaniitti, waanta hin argine akka waan arganiitti, waanta hin beekne akka waan beekaniitti gabaasuudha.</p>
+
+<p>Ofitti amanamummaan ofta'uu agarsiisa. Ofta'uun immoo murteeffachuu agarsiisa. Murteeffachuunus toora dandeettiifi gahumsa ofiitti amanuun hojjechuu yaaluu, dhuunfaanis tahe gareen dalaguuf akkasumas rakkoowwan guyyuu numudataa oolan salphisuuf tooftaa isa murteessaadha.  Kunis sadarkaa jireenya gaariif shoora olaana taphata. 
+Hubannaa ofii jabeessuu: Hanga ciminaa yookiin dadhabina ofiifi beekumsa ofii hubachuu wajjin kan walqabateedha. Kunimmoo keessoo addunyaa keenyaa to'achuuf hirmaannaa keenya ni cimsa. Sadarkaa guddina dhuunfaa keenyaa cimsuufis gaheen inni bahu olaanaadha. </p>
+<h3>III. Ofbeekuu:</h3> <p>Ofbeekuun ofargachuu ni dursa. Yoo barbaaddee of argachuu dandeesse salphaatti ofbaruu dandeessa. Sadarkaa nuti ofii keenya kallattiinis tahe alkallattiin fudhachuu qabnu, sadarkaa ilaalcha keenyaa guutummaatti, kan dhoksaanis tahe mul'inatti hubachuuf  nu dandeessisuudha.</p> 
+<p>Miratuu Shaanqoo kitaaba isaa 'Siif Galeeraa?' jedhu keessatti wantoota heedduu nuuf tarreesseera. Ofiikee hin beekne taanaan ofwallaaluun sitti hin ulfaatu. Ofwallaaluun ammoo gadaantummaafi hirkattummaa waliin hariiroo sirrii qaba.</p>
+<h3>IV. Murtoo godhachuu:</h3> <p>Adeemsa nuti odeeffannoowwan barbaachisoo ta'an walitti qabachuufi walsimsiisuun hojiiwwan keeya salphaatti raawwannu kan agarsiisuudha. Murteessuuf ammoo murannoo qabaachuu barbaachisa. Kanaaf kutannoofi murannoonkee caalaatti jireenyakeef murtoo akkati qabaattu godha.</p> 
+<h3>V. Hariiroo qabaachuu:</h3> <p>Waanti hojjetamu tokko galma akka gahuuf walitti dhufeenyi namoota biroo barbaachisaadha. Isaan kunis gurmaa'insa, quunnamtii, fi hariiroo sirrii hawaasummaa namoota lama gidduu jiru kan agarsiisaniidha. Milkaa'inakeef hirmaannaan namaa murteessaadha. 'Kopha nyaattuun kophaa duuti' akkuma Oromoon jedhu, kophaa adeemuun kophaatti kufanii hafuu ta'a. Kanaaf, qulqullina hojii ati hojjettuuf kophaa hin socho'iin namni sibarbaachisaa.</p> 
+<h3>VI. Dhiibbaa hiriyaa dhorkuu danda'uu:</h3> <p>Dhiibbaan hiriyaa karaa lamaan ilaalamuu danda'a. Isaanis: Hiriyaa firaafi hiriyaa farraa jedhamu. Hiriyaan farraa fakkeenyaaf hiriyaan kee tokko kan tamboo aarsu, jimaa qama'u, hatuufi kan kana fakkaatu yoo tahu, faallaa galma kaayyoo keetiiti.</p> 
+<p>Hiriyaan firaammoo,  kan sicaalaatti gahumsakee beeku waaqakee fi namoota yeroo ati dogoggortu si sirreessuun, yaadaafi qeeqa barbaachisu siif kennan yoo tahu, galma gahiinsa kaayyoo keef hariiroo kallattii warra qabaniidha. Walumaa galatti, Hojiikee hundumaaf akka sigargaarutti Firaafi Farra mul'atakee adda baafachaa adeemi. 'Hiriyaa gadheen amala gaarii mancaasa' akkuma kitaabni qulqulluun jedhu sana atis filannoo hiriyaakee akeekkadhu.</p>
+<h3>VII. Rakkoo furuu danda'uu:</h3> <p>Umamumti dhala namaa rakkinaan kan guutamteedha. Jireenya keetiif qormaatni murteessaadha. Osoo qoramuun hin jiru ta'ee darbuunis kufuunis hin jiru ture. Kunimmoo jireenya hiika dhabsiisa. Kanaaf rakkina adeemsakee keessatti simudatu furuu danda'uuf gahumsi kee gahee guddaa qaba.</p> 
+<p>Rakkina sirra gahe furuuf gurmaa'insi namootaa furmaata fiduu hin danda'u. Asirratti baacoo gabaabaa tokko siyaadachiisuun fedha: Guyyaa keessaa gaaftokko, namicha tokkotu karaa deema ture. Osoo deemsa isaarra jiruu, laga  tokkotti bahe. Achittis Buutii/Bofa arge. Maal akka hojjechaa jiru boficha gaafannaan, ''nama bishaan sana na ceessisun dhabee  rakkataa jira.</p> 
+<p>Atimmoo bishaan daakuuf dandeettii qabaachuukee akka gaariittan beeka'' jedhee erga itti himee booda, akka namichi mataatti baatee bishaan sana ceessisuuf fedhiisaa gaafate. Namichoonis itti walii gale. Boficha mataatti baatee bishaan gamatti ceesifnaan  mataa namichaarraa bu'uu dide. Osoo isaan dhaabatanii narraa bu'iifi sirraa hin  bu'uutti wal falmaa jiranii sardiidoon biraan baate. Waldhabdeen isaanii maal akka tahe arga gaafatteen booda bofti irraa buhuu diduu namichi hubachiise. Boodarra waldhabdee isaanii kana akka furtuuf namichi sardiidoof hoolaa akka arjoomuuf itti hime.</p> <p>Sardiidoonis gammaddee, bofichaan "lafti keenya kun seera mataa ishee qabdi; Seerichis dhaabbataadha; Akka seera dacheetti immoo yeroo waldhabdeen hiikamu mataa namaarra taa'uun sirrii miti; Seera cabsuun immoo akkuma ati beektu, safuu hawaasaa cabsuudha; Dacheerra dhaabatanii murtii laatu, marii'atus, kanaaf namicha kanarraa bu'i" jetteen.</p> 
+<p>Boftis itti waliigalee mataa namichaarraa gadi buunaan  namichi akka ajjeesuuf mala/tooftaa laatteef. Namichi boficha ajjeefnaan akkataadhuma walii galteesaanii duraatti sardiidoon hoolaa isheef waadaa duraan galame eeggachuu jalqabde.</p>
+<p>Namichi garuu hoolaa erga qaleen booda rifeensa isaa sareetti aguugee keessa dhoksee sardiidoof erge. Sardiidoonis namicha waan shakkiteef afaan boollaarra teessee eeggachuu eegalte. Saree  gara boolla sardiidoon keessa jirtuutti fiigu wayita argitu "tooftichi kan keenya" jettee boollashee keessa badde jedhama. 
+Walumaa galatti rakkoo siquunname salphaatti daboo osoo itti hin barbaadiin dura dhuunfaatti furuuf yaalii geggeessi. Egaa yaa dubbisaakoo, Kaayyoon tooftaawwan jireenyaatti gargaaramuu beekuu bakka hundatti jireenya fooyyaa'aa jiraachuuf kan gargaaruudha.</p>
+<p>Kunis jireenya kee dhuunfaafis tahe naannoo waliin  hamaaf gaarii adda baasuun, biyyee keessaa warqii filachuufi jireenya rakkinaan badhaadhe salphusuuf kan sigargaaruudha. Kanaafuu, qaamonni salgan ani olitti siif eere jireenya kee akka salphaatti gara fuula duraatti akka tarkaanfachiiftuu daran sigargaara jedheen amana.</p>
+<h2>Qabxiiwwan Ijoo Boqonnichaa</h2><br>
+	<p><h3>1. Jireenyi tooftaadha; Toofticha hin gargaaramne taanaan garuu Gooftaadha.<br>
+	2. Dhiibbaan hiriyaa karaa lamaan ilaalamuu danda'a(Hiriyaa firaafi hiriyaa farraa).<br>
+	3. Osoo qoramuun hin jiru ta'ee darbuunis kufuunis hin jiru ture. <br>
+	4. Rakkina sirra gahe furuuf gurmaa'insi namootaa furmaata fiduu hin danda'u.<br> 
+	5. Kopha-nyaattuun kophaa duuti.<br>
+	6. Tooftaa dhuunfaa keetiin jireenya qabuu yoo dandeesse Gooftaa jireenyaa tata.</h3></p><br>
+
+</p>` },
+            { title: "Boqonnaa 5", content: `<h2>BOQONNAA 5: KUFAATII</h2><br>
+            <p>Yeroo hundumaa hubadhu
+Hin dagatiin bakka kaate<br>
+Yeroon kee bade kaleessaa<br>
+Barbaadimee eessa lixe<br>
+waaqnillee daandii itti laata<br>
+Abboommii isaa kan eegutti<br>
+Akkaaf yeroo kan hubatu <br>
+garaa nama ogeessaati<br>
+Yeroon warqeedha ittiin jennaan<br>
+Caalee argame warqeerra<br>
+Qabeenya dhuunfaa ta'uusaa<br>
+Anis hubadhee argeera<br>
+<br>
+Utuu itti hin yaadiin dursee<br>
+Ariifate inni bilchaate<br>
+utuu eeguu isa bukate<br>
+Akkuma tasaa gubate<br>
+Kaleessi kee du'eera<br>
+Boriin keemmoo hin dhalanne<br>
+Har'akee jebeessii qabadhu<br>
+Tasa akka sirkaa hin sarbamne</p><br>
+<p>Yeroon qabeenya waliinii hin haaromfamne tahus namoota baay'ee biratti gatii waan argate hin fakkaatu. Yeroon altokko nudarbinaan akka salphaatti duuba deebinee argachuu dhabuun keenyammoo daran qabeenya hin haaromfamne tahuusaa nuuf addeessa. Yeroon warqii osoo hin taane qabeenya warqeen hin madaalamneedha. Warqiin gaaf tokko yoo dhabame gaaf biraa argamuu danda'a, yeroon garuu altokko darbinaan deebinee argachuu hin dandeenyu. Kanaaf yeroo qabaniis dhaabbachiisuun waan hin danda'amneef warqiidhaan oli.</p>
+
+<p>Baay'een keenya yeroon qabeenya ta'uusaa waan hin hubanneef bakkaafi haala hin taaneen wantoota jireenyaaf bu'aa hin argamsiifneen qisaasessaa oolla. Yeroon hangafa uumamaa ta'uunis dhalootaaf ifa waan ta'e natti hin fakkaatu. Uumama hundumaaf yeroon bu'uura ta'uus karaa seera uumamaa argachuu dandeenya.</p>
+<p>Waanti addunyaa kanarratti qaalii taheef qixatti kenname YEROO(TIME) tahuu hin dagatiin . Akkuma warri adiin ''yeroon warqiidha'' jedhan  gatiin ati yerookeef kennitu jireenyakeef murteessaadha. Gatiin yeroon ittiin madaalamu kan mi'oota addunyaa kana irratti akka salphaatti hin argamneef baay'ee qaalii ta'een olitti ilaalamuu qaba.</p>
+<p>Hojjechuufis yeroon murteessaadha. Hojiin hojjetamu qarshii argamsiisuun utuu hin taane yeroo itti baheen yoo madaalame gaariidha. Hundumtuu yeroo waliin bareeda. Keessumattuu yeroon dargaggummaa qarshiitti utuu jijjiiramee hangam ta'a jettee tilmaamteettaa? Argameemmoo qarshiin ni bitamaa? Yerichis silaa yeroo itti of-yaadatan ture. Dhaloonni ofiisaa yaadate, bara dargaggummaa isaatti waan dhalootaaf tahu heedduu lafa kaahuu danda'a ture.</p> 
+<p>Yeroo itti hojiif humni jiru, fiiganii qaqqabuu, arii'aniis qabuu, deemanii tabba bahuu danda'an. Walumaa galatti yeroon dargaggummaa yeroo ati uumaa biraa lafa kanarraa qabdu warreen kaan irraa adda. Dargaggeessaa/Dargaggeetti umuriikee dargaggummaa yookiin yeroo bareedduu baay'ee sitti tolaa jirtu kana keessatti maal fa'a hojjechaa jirta?</p> <p>Gammaddeema dabarsuu qofaa? Moo yeroo barsiisaa argitu-barsiisummaa, yeroo farfataa argitu-faarfataa, yeroo konkolaachisaa argitu- konkolaachisummaa, yeroo dokteera argitu-Doktoorummaa, yeroo balaliisaa argitu-balaliisummaa fa'a hawwuun yeroo kee xumuraa jirta?</p> 
+<p>Na dhaggeeffadhu, waan darbuuf jettee gocha hin dabarre hin raawwatiin. Kun immoo bara kee hunda hawwiidhaan akkati xumurtu si taassisaa. Yerichi darbinaan yoomiyyuu duuba hin deebi'u garuu gochi ati yericha keessatti raawwatte gaariis ta'e gadhee, hamaas ta'e tolaan yoomiyyuu hin darbu. Yeroo keef sammuu kee wal quunnamsiisuu yaali. Yeroo bareedaa qabdu keessatti hojii bareedaa hojjechuu yaali.</p>
+<p>=Bareedinni sammuudhaa umrii wajjiin dabalaa yoo deemu kan bifaa immoo hir'achaa deema 
+(Jon -F- keneediin)</p>
+<p>Yeroo hojjechuu qabdutti yoo hin hojjetiin yeroo kabajamuu qabdutti salphina keessummeessuun kee waan oolu miti. Kanaaf umuriikee oladeemaa kana fayyadami.  Yeroo sammuun kee umuriikee waliin guddachaa adeemu, bifni kee immoo dadhabaa adeema jechuu barbaadeetu hima kanatti gargaarame-hayyuun Joon F. Kenediin jedhamu.</p>
+<p>=Time is in limited supply: there are only 24 hours in a day. And because the time we have is limited(Quantam Economics)</p>
+<p>Addunyaa guutuutti dorgomaa tahuuf qabeenya gahaa  Addunyaa waliin  sidorgomsiisu qixa dhabdus, yeroon ati qabdu garuu qixadha. Addunyaa amma irra jiraattu kana harkaa galaa yeroo muraasaa qabaachuu kee hin dagatiin.  
+Yeroon hin dulloomu, hin jaarus; Yeroon siif namoota siin fakkaataniif  kenname garuu daangaa mataasaa qaba. Akkuma Kitaabni qulqullichi addunyaa kanaa nu hubachiisu, barri ati addunyaa kanarraa qabdu 70 hanga 80 ti jedhu, namoota muraasaaf immoo Carraan achi gahuu dhabamuu danda'a. Sababni isaa dhalli namaa bara lafarra jiraatu yookiin jireenya isaa guyyuu keessatti  yeroo hundumaa du'a baadhatee imalaa oola waan ta'eefi</p>
+<p>Yoomin addunyaa kanarraa waamama(du'a) jettee yaaddee beektaa? Deebiin koo yeroonsaa hin beekamu kan jedhu tahuu mala. Hubattee ganama, galgala, hirriba keessa, balaa konkolaataan, balaa elektiriikaan, gororaan, dhibee balaafamaa tokko tokkoon, osoo teessuu, osoo deemtuu, osoo raftuu, osoo nyaattuu, osoo dhugduu, osoo taphattuu, osoo barattuu, osoo barsiiftuu, osoo sirbituu, osoo farfattuu, fi kanneen kana fakkaatan fa'a keessa tahuu dandaa'a. Yeroo hundumaati jechuudha.</p> 
+<h3>Qabannaa yeroo</h3>
+<p>Qabannaan yeroo, dandeetti nuti galma akeekame tokko gahuuf sa'aatiiwwan guyyaatti nuuf kennaman qabachuufi fayyadamuu keenya kan agarsiisuudha. Kunis qe'eewwan jireenyaa kanneen akka hojii, mana, jireenya hawaasummaa fi yeroowwan irraa hafoo(hobbies) kan ofkeessatti haammatuudha.</p>
+<p>Yeroo qabachuu danda'uuf kaayyoo murtaa'aa fi dhimmoota raawwachuuf dursi kennameef irrati xiyyeeffachuun barbaachisaadha. Yerootti haalaan fayyadamuu jechuun yeroo hundumaa hojiin ko'oommachuu(buzy) jechuu miti. Waanta hojjechuu qabdu yeroo isaaf barbaachisutti xumuruu danda'uu jechuudha. Fayyadamni yeroo gaariin, boqonnaa sammuu, dadhabbii xiqqaa, gammachuufi milkaa'insa gaarii argamsiisuu danda'a.</p>
+<p>Yeroo qabachuu jechuun immoo yeroo/sa'aatii diiskoofi seekkoo jedhaman sana harkatti ka'atanii deemuu miti.  Yeroo harkatti kaachuun miidhaginaaf malee yeroo qabachuuf hin oolu. Yeroo deemsifanna jedhanii harka wslqabatanii daandiirra jooruu miti. Keessumaayyuu namoonni muraasni jireenya dhuunfaa isaanii ijaaruuf osoo hin taane balleessuuf akka gargaaraman beekamaadha.</p> 
+<p>Yeroo deemsifanna jedhanii mana caatiifi sigaaraa deemuun umurii isaanii irraa namoonni hir'isaa oolanis kumaaf kitila. Yeroo kee akkamitti kabajja? Midhaan yoo sirkaa jige/dhangala'e lafaa funaantee itti fayyadamuu dandeessa. Yeroo baay'ee immoo bishaan darbe hin waraaban jettee wayita mammaaktus dhaga'eera.</p> 
+<p>Yeroo darbe jettee mammaaktee beektaa? Hin gowwoomfamiin! Yeroon darbeef bishaan darbe tokkuma. Waan si ajaa'ibu garuu bishaan darbe laga biraa deemtee waraabbachuu dandeessa, yeroo darbe garuu yoomillee deebitee argachuu hin dandeessu.</p>
+<p>Kanaafuu ogummaan yeroo haala gaariin fayyadamuu milkaa'insa jireenyaa, gammachuu dhuunfaafi nagaa sammuutiif murteessaadha. Qarshii lakkaa'amuun olitti, yeroon qabeenya daangaa'aa waan ta'eef qusachuu, ogummaan itti fayyadamuufi kabajuun dirqamadha. Namoonni yeroo isaaniitti haalaan  fayyadamu jedhamanii yaadaman amaloora armaan gadii calaqqisiisu:</p>
+	<p>-Caalaatti oomishtootadha.<br>
+	-Galma isaanii dhugoomsuuf anniisaa qabu<br>
+	-Dadhabbii miiraa hinqaban.<br>
+	-Dandeetti waan hojjechuu barbaadanii qabu.<br>
+	-Wanta barbaadan yeroo hojjetan ni gammadu.<br>
+	-Hiriyoota isaanii waliin hariiroo sirrii uumuuf fedhii qabu.<br>
+	Yeroo hunda ofiisaaniitti gammadoodha.</p><br>
+ <p>"Addunyaan kun bor nii baddi yoo naan jedhan illee, har'a sanyii facaasuu hin dhiisu."" jedha Maartiin Luuter Kiingi. Atis yeroo keerra hin rafiini ka'ii dhalootaaf karaa saaqi. "Ani duunaan margi biyya lafaa irratti hin margin" isa harreen jette hin dhugoomsiin. Sanyiin dhalootaaf tahu sikeessa waan jiruuf, Si gargaarus si gargaaruu baatus dhalootaaf facaasi ni biqilaa.</p>
+ <h2>Qabxiiwwan ijoo Boqonnichaa</h2>
+	</p><h3>1. Yeroo harkatti ka'achuun miidhaginaaf malee yeroo qabachuuf hin oolu.<br>
+	2. Yeroo hojjechuu qabdutti yoo hin hojjetiin yeroo kabajamuu qabdutti salphina keessummeessuun kee waan oolu miti.<br>
+	3. Addunyaa guutuutti dorgomaa tahuuf qabeenya gahaa Addunyaa waliin sidorgomsiisu qixa dhabdus, yeroon ati qabdu garuu qixadha.<br>
+	4. Yeroon darbeef bishaan darbe tokkuma.<br>
+	5. Dhalli namaa bara lafarra jiraatu hundumaa du'a baadhatee imalaa oola.<br>
+	6. Yeroon Qabeenya addunyaa guutuuf qixa kennameedha.</h3></p><br>
+
+</p>` },
+            { title: "Boqonnaa 6", content: `<h2>BOQONNAA 6: Guddina Dhuunfaa</h2>
+            <p>Akka aadaa uumamaattis taanaan guddinni dhuunfaa sadarkaalee heedduu qaba. Addunyaa kanarrattis namni akkuma dhalateen guddate hanga ammaatti hin argamne. Daa'imni tokkos dhalatee guddachuuf dirqama sadarkaalee heedduu keessa darbuun isaa ni beekama.</p> 
+<p>Guddatee nama gaheessa akka tahuuf nyaatawwaniifi dhugaatiiwwan sadarkaa inni irra jiru irratti isa gargaaruu danda'antu kennamaaf. Hanga sadarkaa guddina isaatiin olis tahe gaditti garuu yoo fayyadame dubasaa dhibeetu jira. Kanaaf hanga humna isaatti kunuunsi ni godhamaaf. Guddisuuf guddina toluutu barbaachisa. Guddina hawaasa murtaa'aa tokkoof guddinni dhuunfaas murteessaadha. Jaamaan jaamaa akkasaatiitti daandii agarsiisuu akka hin dandeenye, dhuunfaan namni hin guddanne biyya guddisuu hin danda'u.</p>
+<p>Kanaafuu, guddinni dhuunfaa jireenya milkaa'inaa kamiifiyyuu isa baay'ee barbaachisaadha. Eenyuyyuu ulaagaalee guddina dhuunfaaf barbaachisan osoo hin hordofiin  jireenya milkaa'aa jiraachuu hin danda'u.</p> 
+
+<p>Atis ulaagaawwan kana dhuunfaakeen guuttachuuf hin dhamaane taanaan galmakee dhugoomsuuf yaalii geggeessuun ulfaataadha. Yaada kana irratti hundaa'uun, sadarkaawwan guddina dhuunfaa galma kee  dhugoomsuuf sibarbaachisan Arfan  mata-duree itti aanutti ilaaluu dandeenya.</p>
+<p>Isa dura garuu wantoonni ati hubachuu maltu heedduun jiraachuu danda'u. Konkolaachisaan imaltoota lakkoofsa hin qabne fe'ee deemu bakka gahumsa isaa akkuma beeku, dursee wantoota konkolaataa isaa salphaatti karaa dhaabuu danda'an osoo deemsa isaa hin eegaliin  akkuma qixeeffachuuf yaalu, abbaan mul'ataas galma isaa dhugoomsuuf wantoota tarkaanfii isaa duuba deebisuu danda'an injufachuuf dursee itti yaaduu qaba. 
+Wantoonni sadan ani gaditti siif tarreesse immoo caalaatti akkati ulaagaalee guddina keetii guuttattee adeemtee galma kee  dhugoomsituuf sigargaaru.</p>
+
+<h3>A.	Galmawwan kee Hubachuu(Understanding your Goals)</h3>
+<p>Sadarkaawwan guddina dhuunfaa kamiyyuu osoo fudhachuu hin eegaliin dura, waa'ee galma keetii hubannaa gahaa qabaadhu. Kunimmoo dursitee bu'aa galmakee isa dhugaaf sadarkaawwan guddinaa murteessoo siif ta'an akkati adda baafattuuf daran kan sigargaaruudha. Akkuman olitti si hubachiisuuf yaalee ture, konkolaachistoonni hundinuu bakka deemaa jiran fakkii isaa waliin ofirkaa qabu garuu imaltoonni harki baay'een bakka itti adeemaa jiran sana maqaasaa malee waa'ee bakkichaa quba hin qaban. Akkamitti imalaa jirta? Ati jireenya keerratti imalaadhamoo konkolaachisaadha?</p> 
+<p>Jireenya dhuunfaakee irratti konkolaachisaa(geggeessaa) hin taane taanaan immoo jireenya nama biraa irratti imalaa(ba'aa) ta'uun kee waan hin oolleef dammaqi. Galma dhuunfaa kee wallaaluunis imala kee irratti gatii guddaa akka sikaffalchiisuu danda'us hubadhu.</p> 
+<h3>B.	Waanta karoorfatte toorawwan isaan hojiitti galchuu</h3> 
+<p>Sadarkaawwan guddina dhuunfaa kan jalqabu, yaadota maddan toora tooraan gara hojiitti galchuudha. Kun immoo  wantoota galmakee akka caalaatti dhugoomsituuf sigargaaraniidha. Yaadota maddisiistee raawwachuuf karoorfattemmoo hijiitti jijjiiruuf tarkaanfii barbaachisu hin eegaltu taanaan milkaa'ina yaadde sana gonfachuu hin dandeessu. 
+Galma yaaddee jirtu sana salphaatti tuquu danda'uufis rafuu hin qabdu. Gochaan mirkaneessuuf tattaaffii eegaluun dirqamadha. Wantoota raawwachuu qabdutu jiru:Fakkeenyaaf:</p> 
+<p>i.	 Kitaabilee dubbisuu</h3></p>
+<p>Gorsaan addunyattii kana bulchuu yookiin qajeelchuu danda'u kitaabilee seenaa adda addaa ta'uusaa dubbachuun sobaa nan taassisu. Akka hiriyaatti baay'ee yoo waljaallanneyyuu iddoon itti walittu buune raawwatee hin dhabamu. 
+Fakkeenyaaf waantin amma barreeffamaan asirratti ergaa siif dabarsaa jiru kun karaa heedduun sigargaaruu danda'a garuu dhuunfaatti yoo nawaliin haasofte amaloota namummaa baay'ee narrati argitee nanuffuu dandeessa. Kitaabni garuu amala namummaa hin qabu garuu nama(hayyuu) ati beektuun gararraatti sigargaaruu danda'a.</p>  
+<p>-Stories are good for us, whether we hear them, read them, write them, or simply imagine them. But stories that we read are particularly good for us. In fact I believe they are essential.
+-Frank Smith, Reading: FAQ</p>
+<p>Yoo dhaggeeffachuu, dubbisuufi barreessuu dandeesse seenaan siif gaarii tahuu mala garuu seenaa ati ofiikee barreessite ammoo daran gaariifi murteessaa jireenya keetiiti.  Fuuldurakee bareedaa taasifachuu yoo barbaadde seenaa dhaggeeffachuu danda'uun murteessaadha.</p> 
+<p>Dhaggeeffachuuf fedhii guutuu qabaannaan ammoo dubbisuun salphaadha. Dubbisaa gaarii taanaanis barreessuun waan hafu miti. Kunis addunyaa kitaabilee waliin hariiroo cimaa tahe qabaachuu keessaa kan argamuu danda'uudha.</p> 
+<p>ii.	Viidiyoowwan garaagaraa daawwachuu</p>
+<p>Dhaloonni ammaa kun wantoota daawwachuuf fedhii gahaa qabaatus, wantoota jireenya dhala namaaf suukanneessoo(sodaachisoo) tahan irratti kan xiyyeeffateedha. Kun immoo milkaa'insa irratti dhiibbaa guddaa fidaa jira. Wantoonni toora miidiyaa irratti daawwataman marti milkaa'insa jireenya keef si gargaaruu hin danda'an. Keessumaayyuu gama hawwasummaan addunyaa irratti yaaddoo hamaa fidaa kan jiran keessaa viidiyoowwan saalquunnamtii toora miidiyaawwan hawaasummaa irratti gadhiifamanii jiran daawwachuu irraa kan kahe namoonni kumaatama heedduutti lakkaawwaman gaa'ilaan ala ta'aa jiraachuu isaaniti.</p> 
+<p>Asirratti hubannaa heedduu gaafata. Waanti ati daawwachuu qabdu kan milkaa'ina kee boriif siqopheessu tahuu qaba. Fakkeenyaaf haasaawaa oonnachiisoo ta'an, jechoota hayyootaa, gorsawwan maanguddootaa toora miidiyaan daddarban daawwachuun barnoota gahaa argachuu dandeessa.Kan dhageesserra kan argitemmoo caalaatti  sigargaaruu danda'a. Sababni isaa dhagahuurra argitee adda baafachuun karoorawwan kee jajjabeessuuf daran milkaa'na keef iddoo olaanaa qaba.</p> 
+<p>iii.	Sarara tekinooloojii gargaaramuu</p>
+<p>Addunyaa nuti amma keessa jiraataa jirru kun yeroo ammaa kana guddina teknooloojiin faayamtee jirti. Hamma keetti hirmaannaa taasisuu yaali. Yeroo gaarii argatte kana haalaan kunuunsitee itti fayyadamuun addunyaa waliin hirmaannaa taasisi. Addunyaaf muuxannookee kennuufi fudhachuu barbaadda taanaan Sarara tekinooloojii gargaarami. Waanta waa'ee hinbaafneef tekinooloojii hin gargaaramiin. Kunis yerookee qaalii akka dagattu si taasisa waan taheef.</p> 
+<p>C.	Jireenya gammachuun guutuu taasisuu</p>
+<p>Jireenya gammachuun guute tokko jiraachuu wayita eegaltu,waanta hojjechaa jirtu kamittuu caalaatti gammachuuf milkaa'ina daangaa hinqabne argatta. Hanga dandaa'ametti galmi olaanaan guddina dhuunfaa jireenya gammachuun guute argachuudha.Yeroo hundumaa wantoota milkaa'inakee wajjin hariiroo sirrii qabaniif gammachiisoo ta'an hojjechuu yaali. Yoosimmoo karaa salphaan galmakee waliin walarguu dandeessa.</p> 
+<h3>Sadarkaawwan Guddina dhuunfaaf murteessoo ta'an</h3>
+<p>i. Yaaluu(practice):</p>
+<p>Inni kun sadarkaa guddina dhuunfaa isa jalqabaati. Waanta gochuuf karoora keessa galchite tuttuquu danda'uu qabda. Yaaluu jechuun yeroodhuma tokko shaakalanii nuffuu miti. Irra deddeebii gaafata. Yaaliin walirraa hin cinne milkaa'ina hin safaramne si gonfachiisa. Practice make prefect. Kalaqawwan addunyaa kana irratti argaman martinuu yaalii heedduu keessa darbaniiti kan nu dhaqqaban. Kanaaf yaaliikee walirraa osoo hinkutiin geggeessi.</p> 
+<p>ii. Of-fooyyessuu</p>
+<p>Yaalii heedduu wayita geggeessuu eegaltu, ofiikee ijaaruufi fooyyessuun salphaadha. The more you practice, the better you improve your self. Namummaan kee yaalii yeroo mara geggeessitu irraan  kan ka'e  jijjiramaa adeema. Namummaan jijjiirame immoo yaada jijjiiramaa duraan hin turre maddisiisuu danda'a.</p> 
+<p>iii. yaada haaraa maddisiisuu</p>
+<p>Yaaltee ofiikee fooyyessuu irraan kan kahe osoo hin se'iin yaada haaraan walargita. Yaadni ati duraan sammuu keessa qabdu osoo hin badiin kan ati isa caalaatti itti milkoomuu dandeessu daandii(xurree) yaalii irratti nagaa sigaafachuuf harka sitti hiixata. Kunimmoo sadarkaa guddina dhuunfaakee irratti onnee haaraa siif uuma. Yeroo kana immoo karaan kee wal siif qixxaachaa adeema. Daandii haaraa kanaan hamileen kee jabaataa waan adeemuuf dadhabbii tokko malee waanta karoorfatte tokko hammaafi qixa yaaddeen olitti galmaan gaahatta.</p> 
+<p>Kutannoo asirraa argatteen yoomiyyuu duubatti deebi'uun hin jiru. Yaalii kee walirraa hin cinne keessaa yaada haaraa kana argachuuf waanti ati dirqama qabaachuun sirra jiru ABDII dha. Galaan injifattootaa inni dhugaan immoo Abdiidha. ''Kan argatanirra kan abdatantu caala'' jedha mitiiree Oromoon yeroo abdachuuf mammaaku.</p> 
+<p>Kunis Dhugaa dubbii saba dhugaa barbaaduun dubbatameedha. Riichaard Niiksoon.  Waa'ee Abdii irratti waan tokko dubbate Namni tokko yommuu kufu hin injifatamu, yommuu abdii kutatu injifatama kan jedhuudha. Abdiin sikeessa hin jiru taanaan inni kun vaayirasii tahuu mala waan taheef kophaa jiraadhu malee dhalootaa wajjin tuttuqaa hin geggeessiin. Vaayirasiin Abdii dhalootaa nyaatu, kan dhiiga diimaa nafa namaa keessaa nyaatu sana caalaas balaa cimaa tahe dhaqqabsiisuu waan danda'uufidha.</p> 
+<p>iv. Of-argachuu</p>
+<p>Eenyummaakee isa sirrii barachuufi nama  addaa tahuu kee  hubachuun yookiin beekuun adeemsa of-argachuu kee irraa argamuudha. Kunis hojiikee addaatti akka hojjettuuf maamila gaarii akka argattuuf carraa bareedaa kan siif kennuudha. Namoonni heedduun eenyuun akka tahaniifi eenyummaa isaanii isa sirriin wal hin arganne. Nama addaa akka tahan wallaalanii nama kan biraa tahuuf yeroo isaan itti ifaajjii bu'aa hin argamsiifne  ifaajan ni argina.</p>  
+<p>Atimmoo carraa argatte kanaan ammumarraa eegalii nama addaa tahuukee hubadhu. Nama addaa tahuuf ifaaji malee aadaa nama kan biraa calaqqisiisuuf hin dhama'iin. Namoonni baay'een hojii isaanii akka addaatti osoo hin taane akka aadaatti hojjetanii milkaa'uu barbaadu. Kun immoo yeroo ammaa waliin walfaallessa. Akka addaatti milkaa'uufis akka akkuma addaatti ifaajuu yookiin carraaquutu barbaachisa.</p> 
+<p>Ati gurbaa/intala diimaa/diimtuu, dheeraa/dheertuu, ogeessa/ogeettii, fokkisaa/fokkistuu,   gurraacha/gurraattii fa'a sana miti. Eenyuree? Nama waaqi bifasaatti fakkeessee of-ta'i jedhee qophaa isaa uumeedha.
+Eenyuree inni? Ati si'umadha. Siin mataakee jechuudha. Ati nama addaati. Hin beektumoo? Ati Eenyuunuu fakkaachuu dandeessa garuu eenyuunuu tahuu hin dandeessu beeki. Namni si fakkaatu jiraachuu mala garuu si tahuu hin danda'u.</p> <p>Eenyummaan kee eenyummaa nama biraan yoo walfakkaates eenyuunuu si gochuu hin danda'u. Kophaa dhalatte jechuun immoo kophaa jiraadhu jechuu miti. Namni sibarbaachisa, keessumaayyuu immoo milkaa'ina kee irratti hirmaannaan namaa gahee olaanaa qaba. Gatiin namaa olaanaadha.</p> 
+<p>Mi'i bittee yoo si gargaaruu dide dabarsitee gurguruu dandeessa garuu nama bitachuus gurgurachuu hin dandeessu. Kanaafuu sadarkaati dhala namaaf qabdu olaanaa tahuu qaba. Kana hin taane taanaan milkaa'inni kee salphaatti saffisuu hin danda'u.</p>
+<p>Moloksee lamatu kellaa kuusaa bishaanii(pond) qurxummiileen itti horsiifaman irratti walitti dhufan jedhama. Molokseen inni tokko hir'eesaa kellaa sanarra dhaabbatee ''argitaa qurxummiiwwan kana osoon ta'ee nan hawwa ogummaa guddaa qabu-Ogummaa bishaan daakuu, kanaaf isaan yeroo hunda gammadu'' jedhe. Molokseen inni kanbiraan itti ashoofaa ''akkasaan gammadan akkamitti beekte atoo qurxummii mitiim'' jennaan  molokseen inni duraanii ''akkan hin beekne akkamitti beekte atoo ana mitii'' jedheen jedhama.</p> 
+<p>"Utuun ebeluun ta'eera ta'ee silaa akkasan godhan ture". Kan jedhu kun addunyaa keenya dhuunfateera. Osoon sinbira tahee nan barrisa  jettee yoo ofirratti dubbatta tahe, ati yoomiyyuu sinbira hin taatu barrisuus hin dandeessu. Deemsumakee akkaataa addaan itti fufi malee barrisuuf yaalii yoomiyyuu hin danda'amne hin geggeessiin. Mee walaloo kana keessatti of-ilaali.</p>
+<p>Hamma   geessu   beeki!<br>
+Gitakee   hin    wallaaliin!<br>
+Nama  akkakee   fuutee,<br>
+Offitti    hin   madaaliin!<br> 
+<br>
+Ati     si'uma         malee<br>
+ Nama    kanbiraa    miti.<br>
+ Eessaayyuu hin argattu<br>
+Ati  nama   akka   keetii.<br>
+<br>
+Awurooppaadhaan bahii!<br>
+Deemiyyuu      Ameriikaa!<br>
+Addunyaan nama akkakee,<br>
+Eessatti   argee   beeka!<br>
+Barrisi     Eeshiyaattis!<br>
+Naanna'is     Afiriikaa!<br>
+  Namni siin bakka bu'u,<br>
+          Raawwatee hin jiru takkaa.<br>
+<br>
+Ati lamas hin taatu,<br>
+Furdattees yoo qal'atte,<br>
+Ofiima  keetti   amani!<br>
+Dheerattes gabaabbette!<br>
+Utuuti ofiikee beektee,<br>
+   Namniyyuu sin wallaalu.<br>
+   Callisee keessa seenee,<br>
+     Hojiikeellee hin madaalu.<br>
+Yoo ati ofiikee beekte<br>
+Addunyaat sileellisa.<br>
+Deemee walirkaa fuudhee<br>
+Waa'ee keeyyuu weeddisa.<br>
+            <br>
+            Siin Uumaan si'uma uumee.<br>
+         Ati namni addaa hin jirtu.<br>
+          Ofiikee bakka hin buutuu?<br>
+      Maaliif kan garaa hirtu?<br>
+Ulfina ofitti hin gootu?<br>
+Ati eenyuun gadi miti.<br>
+Yoo ofiikeetti amantes<br>
+Kabajamaa namaati.<br>
+   <br>
+Uumaan kan sijaal'atu,<br>
+Yooti ofiikee beekte.<br>
+      Ofiikee hubachuudhaaf<br>
+    Carraa yoo ofiif laatte.<br>
+<br>
+Maaliif hidhiikee xuuxxaa?<br>
+Nama kanbiraa ilaaltee,<br>
+Kaatee maaf hin hojjettu?<br>
+Gatii ofii keef laattee.<br>  
+     <br>
+          Aguugdee innati awwaalte<br>
+         Beekumsi kee inni gaariin<br>
+       Bahee hojii hin hojjetuu?<br>
+  Maaliif gubatta aariin?<br>
+  <br>
+Qalbiikee isa quucarse<br>
+Yaadakees isa saamu<br>
+Miirakee isa adooche<br>
+Yeroo kaayyoon si waamu<br>
+    <br>
+Halkaniif guyyaa yaaddus<br>
+Waa'ee keeyyuu irranfattee<br>
+Nama kanbiraa hin taatu<br>
+Hangam yoo tattaafatte   <br>
+  <br>
+ Farra mul'ata keetii<br>
+ Isa sitti roorrise<br>
+ Ofta'uu isa sidhowwe<br>
+ Isa of-si jibbisiise<br>
+ <br>
+Namummaakee dagannaan<br>
+Isa of-si wallaalchise<br>
+Nama kan biraa tahuuf<br>
+Isa si gomjaasise<br>
+Gufuu sidura taa'ee<br> 
+Sidhowwate tarkaanfii<br>
+Ammumarraa eegalii<br>   
+ Buqqiisii ofduraa dafii!<br></p>
+<p>Akka ilaalcha namaatti, haalli jireenya dhala namaa gosa sadii. Isaanis:-</p>
+	<p>Tokko Caaluu</p>
+	<p>Tokkoon caalamuu</p>
+	<p>Tokkoon qixxaachuu</p>
+<p>Ati nama addaa akka taate beektaa? Hammuma keetti bifaan, amalaan, ogummaan, yaadaan, dandeettiin, ilaalchaan, qabeenyaanis waanta kamiinuu nama akka kee tokko dursuu yookiin caaluu dandeessa. Warreen kana hundaanis kan baay'ee baay'ee si dursaniif sicaalan jiraachuu danda'u. Warri kaan immoo dhibba keessaa dhibba tahuu baatus haalotan olitti siif eereen gita kee tahuu danda'u. Kanaaf si caalaa waa'ee kee kan beeku waaqa malee waan hin jirreef ofii kee hin tuffatiin. Gatii ofii keef lattu dhalootarraa argachuu dhabuu waan dandeessuuf ofkabaji.</p> 
+<p>Daandiin kee jireenyaafi galma keef akka mijatutti, Isa si dursu kabajaan irraa barachaa, isa dursitu  tumsaafi gargaaraa, isa gita kee waliin tokkummaafi jaalala qabaachuun deemsa kee itti fufi. Kana raawwatteetta taanaanis daandiin kee gufuurraa bilisa ta'a. Warra yaada kanatti amananiif daandii isaaniirra abiddi yoo jiraate-gubachuun, gufuun yoo jiraate-gufatanii cabuun, aalbeen yoo jiraate-qalamuun, galaanni yoo jiraate-liqimfamuun, qilleensi yoo jiraate-butamanii kufuun, lolli yoo jiraate-mo'amuun, lolaan yoo jiraate-haramuun bineensi yoo jiraates-nyaatamuun isaan hin argatu.</p>
+<p>Walumaa galatti walaloon olitti dubbifatte ati eenyuun akka taateefi caalaatti immoo akka of bartuuf hubannaa gahaa siif laateera jedheen yaada. Ergaan koos, tokko sababa dursituuf of hin tuuliin, hanga ta'e dursitus hanga baay'eetu si dursee jiraatii. Namaa gadin ta'es jettee galgalaafi ganama hidhii kee hin xuuxiin, kan sii gadiis jiraatii. Tokkoonan qixxaadha jettees hin tattaafatiin innis kan ittiin qixxaachuu barbaadu waan qabuuf dhaabatee si eegaa hin jiruutii.</p>
+    <h2>Dubbiiwwan Ijoo Boqonnichaa</h2>
+	<p><h3>1. Jireenya dhuunfaakee irratti konkolaachisaa (geggeessaa) hin taane taanaan jireenya nama biraa irratti imalaa(ba'aa) taata.
+	2. Namummaan jijjiirame yaada jijjiiramaa duraan hin turre maddisiisuu danda'a.<br>
+	3. Namoonni heedduun eenyuun akka tahaniifi eenyummaa usaanii isa sirriin wal hin arganne.<br>
+	4. Ati Eenyuunuu fakkaachuu dandeessa garuu eenyuunuu tahuu hin dandeessu beeki. <br>
+	5. Galaan injifattootaa inni dhugaan Abdiidha.<br>
+	6. Gatii ofii keef lattu dhalootarraa argachuu dhabuu waan dandeessuuf ofkabaji.<br> 
+	7. Namoonni baay'een hojii isaanii akka addaatti osoo hin taane akka aadaatti hojjetanii milkaa'uu barbaadu.</h3></p><br>
+
+</p>` },
+            { title: "Boqonnaa 7", content: `<h2>BOQONNAA 7: Warra Jijjiiraman</h2>
+            <p>Rakkinoota keenya irraa baqachuu hin dandeenyu. Injifatamtoota qofatu dhaabatee abdii kutata. Milkaa'inni bakka nuti jireenya keessatti qabnuun kan madaalamu osoo hin taane baay'ina rakkinoota nuti jireenya keessatti furreen kan madaalamuudha. Egaa warri jijjiiraman gahumsuma isaaniitiin dorgoman. Seenaawwan milkaa'inaa hundi immoo seenaawwan kufaatiwwaniiti. Namoonni milkaa'anis waanta guddaa hojjetan osoo hin taane waan xiqqaa karaa guddaadhaan hojjetan.</p> 
+<p>Injifachuuf taphachuufi akka hin injifatamneef taphachuu gidduu immoo garaagarummaa guddaatu jira. Injifachuuf wayita taphannu, si'aa'inaafi ofkennuudhaan taphanna; Akka hin injifatamneef wayita taphannu immoo bakka dadhabaa qabannee taphanna. Akka hin injifatamneef wayita taphannu, kufaatii ittisuuf taphanna. Hundaan ol injifachuuf taphanna garuu baay'ee muraasatu injifannoo qopheessuuf gatii baasuuf qophaa'a.</p> 
+<p>Injifattoonni injifannoo galmeessuuf haala mijaassuun ofii isaani ni kennu. Injifachuuf taphachuun kaka'umsa keessaa kan maddeedha, akka hin injifatamneef taphachuun garuu abdii kutannaa keessaa kan maddeedha. Dhiibbaan namoota injifachuuf taphatan cimoo taasisa. Warra akka hin injifatamneef taphatan immoo anniisaa duraa fixa. Jijjiirama Addunyaa kanarratti namoonni milkooman waantoota afur  fayyadamuun namoota kaan caaluu waan danda'aniifi.</p>
+ <h3>Waanta namoonni yaaduu dadhaban yaaduu dandaa'aniiru.</h3>
+<p>Dhalli namaa jiruufi jireenya isaa guyyaa guyyaa  keessatti yaadi inni hin maddisiifne hin jiru. Yaadonni yaadaman martinuu hojiitti jijjiiramuu baatanillee sadarkaan yaadaa dhala namaa guyyaa guyyaan dabalaadhuma adeemaa jira. Akkuma kitaabni barreeffamaan maxxanfamee nuti dubbisnee hubachuuf itti fayyadamaa jirru kun yayyabni(bu'uurri) isaa tuqaa irraa tahe, wantoonni harka namaan kalaqamanii addunyaa kana irratti mimmiidhaganii argaman kun yaada xiqqaa sammuu dhala namaa keessaa kan maddaniidha. Akkuma mana kuusaa maallaqaa(Baankii) keessaa qarshiiwwan gosa adda addaa baay'atanii argaman sammuun dhala namaa hundaa yaadolee garaagaraatiin kan kuufamaniidha.</p> 
+<p>Sammuun namaa bifa geengoo qabu nuti argaa oollu kun yaadolee garaa garaan guutamee saamsamee kan jiruudha. Kanaaf gola sammuu ofii banuu barbaachisa. Yaadonni tiriiliyoonaan lakkaa'aman sammuu dhala namaa keessa jiraatanillee, sadarkaa itti fayyadama sammuusaatti dhalli namaa walcaala-garaagara jechuudha. Iggita sammuu ofii abbaadhumatu beeka. Namni kan biraan waa'ee sammuu nama kanbiraa odeeffannoo yoo qabaates, hojjechiisuuf carraa hin qabu.</p> 
+<p>Bilbila ofii banuuf furtuu yookii iggitni akkuma abbaa harka jiru, dhoksaan sammuu keetii si'uma harka jira. Kanaafuu sammuu kee hojjechiisuuf nama kan biraa hin eegiin. Jireenya isaanii keessattis namoonni kun maraattota jedhamuun waamamu. Sababiin isaas waa dalaguuf yookaan hojjechuuf yeroo isaan yaadan maddisiisan namoonni itti kolfu.</p> 
+<p>Kun waan hin yaadamneedha jedhanii hamilee isaanii cabsu. Jireenyuma keessa jiraatan keessa jiraatanii ,haalotuma isaan rakkisan keessa taa'anii milkaa'ina gonfachuuf aarsaa baasan. Qaamota miiraa isaanii guutuutti gargaaramanii jireenyaaf qormaata fudhatan kan kufan kufanii kan darbanis darbanii milkaa'ina hangana hin jedhamne gonfatan.</p>
+<p>Yaaduun yaadda'uu miti. Waanti hojjetamuuf yaadamu muraasa. Waanti yaadda'amu garuu lakkoofsaan heedduudha. Yaadonni hojjetanii akka milkaa'aniif nama dabarsanis kutaalee sammuu namaa keessa yoo jiraatan yaaddoon hir'inaa humna hin qabu. Humni yaaddoo keetiis si'uma mataa keeti. Obboleessaa obboleettii har'a waan meeqatti yaaddaa'aa jirta? waan meeqammoo sammuu keetiin hojjechuuf yaadaa jirta.</p>
+<p>Namoonni tokko tokko Kitaaba guddicha QULQULLUU dogoggora yeroo hiikkatan akka nama tokkootti nan arga. Baay'een saalfadha. Sababni isaas ''waaqayyo yaadi malee hin yaadda'iin dhimma keemmoo natu siif raawwata naan jedheera maaltu narakkise'' jedhanii harka maratanii ,miilla isaaniis gurraan qixxeeffatanii taa'aa oolu. </p>
+<p>Macaafni qulqulluun dhugaa lafaaf samiirra jiru dhugaadhumatti lafa nuuf kaa'eera. Kana hundattis dhibba keessaa dhibba guddiseen amana. Namni garuu iddoo kanatti baay'ee dogoggora. Yaadi malee hin yaadda'iin jechuun sammuu rabbi/waaqni tola siif kenneen waan gaarii tahe yeroo hundaa yaadi. Ittiinis hojjedhu kan jedhuudha malee mana kees sammuukees cufadhuu uffadhuu rafi maannaan siif harcaasaa jechuu miti.</p> 
+<p>Maannaan tolaas yeroo sabni isiraa'el harka garbummaa jalaa ba'aa jiranitti waaqayyo/rabbi sabni sun geggeessaa isaanii Musee irratti waan gungumaniif nyaata harcaaseefiidha. Isaan kun garbumma jala sababa turaniifi. Dhaloonni ammaa kunimmoo rakkina akkamii haa himaturee? Kanaafuu yaadi hin yaadda'iin hamma humna keetii waan yaaddes ka'ii hojiitti jijjiiri hin taa'inii. Yaadda'uun sodaachuudha, sodaachuunis shakkuudha, shakkuunimmoo milkaa'uu dadhabanii lafuma kufanitti hafuudha.</p> 
+<p>Hir'innis rakkinnis jiraachuu dandaa'a ''waan qabaniin gabaa bahu'' akkuma oromoon jedhee mammaake, yaadii wanuma qabduun socho'i. Milkaa'uunis aluma tokkoon waan yaadan guddaa sana bira gahuu miti. Bilchina gaafata. Ittoon bilchaachuuf akkuma abiddarra baay'ee turu sana milkaa'uufis yaalii walirraa hin cinne gaafata. Jecha Maartiin Luuter Kiing jedhen si yaadachiisa. ''yoo dandeesse barrisi,barrisuu yoo dadhabde fiigi,fiiguu yoo dadhabde deemi,deemuu yoo dadhabde tiradhu,tirachuu yoo dadhabde daa'imi daa'imuus yoo dadhabde foqoqi' kan jedhuudha.</p> 
+<p>Hima dheeraa xaxamaa kanarraa waan heedduu barachuu dandeenya. Sammuun namaa waan hunda yeroo tokkotti akka hojjetuuf caarraa hin laatamneef. Kanaaf yaaduudha. Gatii barbaadamu baasanii waanuma gochuun isaa dandaa'amu hojjetanii milkaa'ana gonfachuuf ifaajuu barbaachisa. Jireenyi sadarkaa heedduu qaba.Gulantaa keessa darbamu heedduu qaba. Qoramaniitu dirree baldhaatti bahu. Kufuun immoo achitti hafuu miti barnootadha malee. Kufanii ka'anii isa fuula duraaf barnooti argamu kufaatii keessaati.</p>
+<h3>Waanta namoonni hojjechuuf itti amanuu dadhabanitti amanan.</h3> 
+<p>Kufaatii guddaan namoonni kasaaran kufan yaadanii shakkuudha. Kana jechuunis waan yaadan sanatti amanuu dadhabuudha. Tarii akkas ta'innaa laata jedhanii karoora isaaniitti shakkii dabalu. Shakkiin immoo diina milkaa'inaati. Namni milkaa'uu dadhabe kan kufe gaafa hojjetee firiisaa arge osoo hin taane gaafuma shakkeedha. Hattuunuu bakka hatuuf deemaa jirtu sana deemtee hattee milkaa'uuf shakkiin jiraannaan ni hafti.  Hojiinshee idilee hanna waan ta'eef yeroo ifni jiru deemtee naannoo sana daawwatti. Waa'ee naannoo mana namicha odeeffannoo gahaa hin qabdu taanaan karaa mana namichaayyuu  hin baatu.</p> 
+<p>Sodaatteettikaa. Sodaan liqimfamtee manashee raftee bulti. Kanaaf kaayyoon isheen hannaaf qabdu yeroodhuma sana sodaadhaan onneen ishee  waan  bututeef kaayyoon sun harkatti fashalaa'a. 
+Dhaloonni ammaa kun waanta tokko yaadee hojjechuuf hawwii heedduu qabaatullee waanta hojjechuuf yaade sanatti milkaa'uuf ofitti amanamummaa gahaa hin qabu. Mee ka'een waan akkasii hojjechuuf yaada jedhee ka'eemmoo waanta yaade sanatti amanuu dadhaba. Yaadni keessa isaa yoo jiraates miirri nan dandaa'a jedhu hin jiru. Obboleessa ko obboleettiiko nama yaaduuf karoorsu yoo taate waanti tokkollee hin dadhabamu.</p>  
+<p>=Hamma ta'ee hin argamnetti waanti hundinuu waan hin danda'amne fakkaata
+(Niilsen Mandeellaa)</p>
+<p>Warri hin dandaa'amu jedhanii isa golkeessoo sammuu isaanii keessaa itti hasaasu dhaggeeffatanii yaada isaaniitti amanuu dadhaban gaafuma sana injifataman. Sammuun ofii akkuma kuusaa mul'ata ofii tahe, diina ofii isa jalqabaati.</p> 
+<p>Waanti golkeessoo sammuu kee keessaa hin dandeessu jedhee sitti hasaasu cufti diina meeshaa qabatee sidura dhaabatu caalatti karaa sidhaaba. Sammuukee itti amansiifnaan waanti ati nan danda'a jeettee karoorfatte marti ni danda'ama. Eeyyee ni danda'ama itti amani. Bishaan sodaatan nama liqimsa. Bineensi sodaatanis nama nyaata. Kanaaf waanti yaaddee hojjechuuf karoorsaa jirtu sun inuma danda'ama ammayyuu itti amani.</p> 
+<h3>Tooftaa ittiin karoora keetti cichitu(Jabaattu)</h3>
+<p>i. Hiriyoota sinbarbaachifne irraa ofqusadhu:</p> 
+<p>"Yoo hiriyaakee natti agarsiifte eenyummaa keen sitti hima'' jedhu warri xaaliyaanii. Hiriyaan kee milkaa'ina dhuunfaakee irratti dhiibbaa karaa lamaa uumuu danda'a. Hiriyaa wajjin jiraattu dursii filadhu. Addunyaa hamma kan baldhaturraa hiriyaa akka keetti si waliin jiraatu akka hin arganne beekamaadha.Filannoo nyaatakee caalaatti filannoo hiriyaa keetu jireenyakee egereef murteessaadha. Hiriyaan sona gaarii qabu, dhiibbaa uumuun gara gaarummaatti si harkisuu danda'a. Haaluma walfakkaatuun, hiriyaan amala badaa qabus garuma amalasaa isa badaatti haala salphaan si harkisuu danda'a.</p> 
+<p>Kanaaf hiriyaa sin barbaachifne waliin hin rakkatiin. Sababni isaa hiriyaa hin taaneen manca'uu irra kophaa jiraatanii milkaa'uun ni caala waan ta'eefi.</p>
+<p>ii. Haala itti fayyadama yerookee fooyyessi</p>
+<p>waanta hojjettu tokkotti gammaduuf, yerookee haala madaalawaa ta'een fayyadamuu yaali. Warqii gati jabeessa harkaa qabdu kana haalaafi bakka hin taanetti hin balleessiin. Hangafni qabeenya keetii yeroo tahuus hin dagatiin. Wantoonni bu'uura jireenyaa namoonni milkaa'an caalaatti guuttatan yeroodha. Yeroon immoo qaaliidha.Sababa hiyyummaa keetiif gadaantummaan yoo sitti dhagaa'ameyyuu yeroo qixaa qabaachuu keen ati sooressa addunyaa kanaati.</p> 
+<p>Atii fi Biilgeet, Alii Baabaa, akkasumas dureessota addunyaa kanaa maraan sadarkaa qabeenyaan wal fakkaachuu baattullee yeroon qabdu tokkuma. Isaan yeroo isaanii haala gaariin waan fayyadamaniif milkaa'aniiru. Kanaaf, yeroo sirkaa bade deebitee argachuu waan hin dandeenyeef kunuunsaa itti gargaaramuu yaali.  Kun immoo milkaa'inakee egereef daran iddoo olaanaa qaba.</p>
+<p>iii. Kaayyoo malee deemsa hin baay'isiin.</p> 
+<p>Namni kaayyoo malee deemuuf qilleensi tokkumadha. Qilleensi gara  imalasaa waan hin beekneef wantoota heedduu burjaajessaa oola. Namni kaayyoo malee deemus yeroo isaafi hiriyaasaa akkasumaan burjaajessaa oola. Kaayyoo malee yeroo deemsisuuf deemaa hin ooliin gaaf tokko yeroon sirra deemuu malti waan ta'eef. "Gabaan waan baateef nagaddi" akkuma jedhamu kaayyoof mul'ata qabaadhu malee akka qilleensa arfaasaa kallattii hundatti hin naanna'iin. Kaayyoo malee wayita adeemtu kallattiiwwan hedduun miidhamuu dandeessa. Fakkeenyaaf:</p>
+	<p>-Uffanni kee yeroo ati hin eegnetti sirratti dhumuu/xuraa'uu danda'a.<br>
+	-Yeroofi bakka hin beekaminitti namaan, hiriyaan walitti bu'uu dandeessa.<br>
+	-Baasii humnaa oliif saaxilamuu dandeessa.<br>
+	-Dhiphina irraan kan ka'e ofceepha'uun(self critism) xiinsammuun miidhamuu dandeessa.<br>
+	-Dhiibbaa hiriyootaan araada adda addaan miidhamuu dandeessa.</p><br>
+<h2>Waanta namoonni hojjechuu dadhaban hojjechuufis yaalaniiru.</h2> 
+<p>Toomaas Eddisen ampuulii nuti mana keenya keessatti ibsannu hojjechuuf lakkoofsa hamma kana yaaluu mitii lakkaa'uunsaayyuu nama rakkisu yaaleera. Yaalii isaatti milkaa'uufis kufaatii 999 keessummeesse. Karaalee hamma kana baay'atantu yaaliisaa keessa ture. Milkaa'inni isaa tokkittiin dandeettiiwwan karaa dogoggoraa hamma kanaa gonfachiifte. Yeroo hedduu yaalee itti kufeera. Kufee barumsa guddaa irraa argate. Yaalii walirraa hin cinne godhee bu'aa addaa nuuf buuse. Kanaaf maqaa du'a gararraa argate.</p> 
+<p>Waanta yaannee itti amanne sana tuquu danda'uun nurraa eegama. Dursa akka namaatti yaadi,itti aansii waanta yaadde sana hojiitti jijjiiruu nan dandaa'a jedhii itti amani. Nan danda'a jettee itti amanteetta taanaan  waanta itti amante sana yaali. Yaalii walirraa hin cinneen gaaftokko nimilkoofta.</p>
+
+	<p>=Yoo milkaa'uu barbaadde gaticha kaffali (Jaak Ma/Ali Baba)</p>
+<p>Namichaa jabaa lammii biyya chaayinaati. Milkaa'ina dhumaa gonfachuuf gatii baasuun irra jiru hunda baasee addunyatti gutuu irratti ifuuf nama onnate,kufaatii itti dhufe mara dandammatee ofitti amanamummaa guddaan kahee yaalii heedduun kufaatii heedduu keessummeessee injifannoo isa dhumaaf nama qabsaa'eedha-Jaak.</p> 
+<p>Wayita barnoota isaa baratu sadarkaa tokkoffaatti yeroo lama, sadarkaa giddugaleessaatti yeroo sadii,sadarkaa lammaffaafi qophaa'inaattis akkasuma yeroo sadii, sadarkaa qophaa'ina xumuree yuunibarsiitii Harvarditti barachuuf yeroo kudhan nama kufeedha. Kun hundi yeroo inni turtiisaa mana barnootaatti dabarsetti kan isa mudatan yoo ta'an, yeroo inni barnoota isaa yuunibarsiitii irraa xumuree hojiisaa barbaaddachuu eegalettis immoo qormaatonni isarra gahan daran sukanneessoodha. </p>
+<p>Sadarkaa yuunibarsiitiitti barnoota isaa xumuree hojii barbaaddachuuf wayita ka'etti Kampashiniin Chaayinaa keessatti argamu kan KFC jedhamu namoota digdamii afur, kan isa waliin dorgomaan keessaa nomoota digdamii sadii calalee fudhatee Jaakiin kuffisuun isaammoo daran yaaddoo hamaa itti taheera. </p>
+<p>Yaalamee abdiin isaafi gatiin dadhabbii dhadhaa ibidda buute fakkattullee, Kufaatiiwwan isa mudatan kunniin garaa kutanii dubatti isa hin deebifne. Ammas tokko jedhee yaalii eegale. Mee kanan immoo ilaala jechuun humna waraanaa yookiin poolisa tahuuf wayitanni yaalii godhetti namoota shan dorgommiif dhiyaatan keessaa akkuma amalasaa duraanii  Jaak shakkii tokko malee kufaatii dhumaa keessummeesse. </p>
+<p>Namoota shan Jaakiin dabalatee dorgoman keessaa namni afur darbanii gara hojii waraanaatti dabalamanillee, isaaf okkoluu taheera. Kun hundi isatti midhama itti hin faakkaanne. Lafa kahes lafa gahus waan beekuuf garaa kutatee diinasaa hin gammachiifne. Balballi karaa tokkoon cufame karaa torbaan banamuu akka danda'u waan hubate fakkaata Jaak. Kanaafuu yaalii heedduu keessaa milkaa'ani bareedduu argatee addunyaa irratti ifee jira.
+Waan kutannoo isaaniin  hojjetanii itti milkaa'aauus dandaa'aniiru.</p>
+
+<p>“Success is not final, failure is not fatal: it is the courage to continue that counts(Winston S. Churchill)</p>
+<p>Jireenyi waanta ati gaafatte siif deebisti. Nuusa yoo gaafatte nuusa, walakkaa yoo gaafatte walakkaa baay'ee yoo gaafatte baay'ee argatta. Gaaffii jireenya gaafattu irratti of-eeggannoo taasisi. Hanga siif dandaa'ametti baay'ee gaafachuu yaali, tureyyuu hamma gaafatte gaaftokko argachuun kee dirqama waan ta'eef. Warri milkaa'an warra, nama barbaadan waliin, bakka barbaadaniifi yeroo barbaadanitti hojii danda'an hojjechuu barbaadaniidha. Warri kufan garuu faallaa warra kanaa ta'uu malu. Kanaaf atis injifachuu ni dandeessa.</p> 
+<p>Injifattoonni waanta adda ta'e hojjatan osoo hin taane waanta hojjetamuuf malu karaa addaan hojjetan. Yaaliin walirraa hin cinne dhumisaa milkaa'ina guddaa ta'a. Milkaa'uu jechuun ammoo akkuma qormaata fudhataniin darbuu jechuu miti. Yeroo baay'ee walitti fufiinsaan yaalanii milkaa'uu dadhabuunis kufaatii hin ibsu.</p>
+<p>Karaan mulkaa'inaa tokko qofa miti. Namoonni adda addaa karaa adda addaa milkaa'ina isaanii gonfataniiru, garuu amalootni muraasni milkaa'ina walfakkaataa gonfachiisuu danda'u. Maarree jireenya jiraattu keessatti atis caalaatti milkaa'aa ta'uu barbaadda taanaan amaloota milkaa'inaafi akkaataa itti fayyadama isaanii akka gaariitti beekuun barbaachisaadha.</p>
+<h3>Maaltu milkaa'aa nama taasisa?</h3>
+<p>Namni milkaa'aadha jedhamu, nama seensa galma isaa argateedha. Namoonni muraasni jireenyi milkaa'aanaa gammachuufi geessifannaa qofadha jedhanii addeessu, kaan immoo fiixaan ba'iinsa jireenyaati jedhu, haa ta'u iyyuu malee kun hundi milkaa'inaaf hiika sirriidha. Milkaa'inaafi jireenyi milkaa'inaa immoo garaa gara. Milkaa'insi adeemsa, jireenyi milkaa'inaa immoo jireenya jiraatamee argame galmadha jechuudha.</p>
+<p>Namoonni milkaa'an marti geggeessitoota cimoodha. Waan berbaaddu argachuuf, namoota biroo hordofuu irra daandii mataa kee baafadhu. Geggeesaa ta'uu danda'uun kees caalaatti galma keetti seenuu akka dandeessuuf mul'ata dhuunfaa kee akkati hordoftuuf si gargaara.</p> 
+<p>Namoonni milkaa'an milkaa'insa adda addaa qabaatanis amaloota walfakkaatan qabu. Isaanis:</p> 
+	<p>-Geggeessitootadha<br>
+	-ofitti amanoodha<br>
+	-Fedhii qabu<br>
+	-saffisoodha<br>
+	-Obsa qabu<br>
+	-Sona gaarii qabu<br>
+	-Dubbii danda'u <br>
+	-Walitti dhufeenya jaal'atu<br>
+	-Barnootaaf fedhii qabu<br>
+	-Itti gaafatamummaa fudhatu<br>
+	-Hirkattummaatti hin amanan<br>
+	-Abdii fuulduraa qabu<br>
+	-waa uumuu fedhu, fi kanneen kana fakkatan fa'a dha.</p>
+<p>Dubbii koo xumuruuf, Kufaatiin dafqa milkaa'inaati. Hojii sochii Ispoortiifi hojiiwwan gaggaarii yoo hojjenne qaamni keenya akkuma jabaatu, kufaatii keenya keessaa milkaa'ina argannee galma yaadametti seenna. Galmichis karaa dhuunfaa isaa qaba.</p> 
+
+<h3>Guduunfaa</h3>
+<p>Karra qaxxamuranii darbuun hoolotaa manarraa isaan fageessee, waraabessa halkanii nyaachise.Oftuulummaan jaldeessafi gamnummaan qamalee mana isaanii muka taasisee yeroo mara balaafi baala isaan nyaachise. Waanjoo baachuu dhadhabuun sangoota gafarsa taasisee bineensota waliin bosonaa  keessa jiraachise. Ba'aa baachuu dadhabuun harree didoo jireenya beeyilada manaa ta'uu keessaa baasee jireenya bosonaa badhaase.</p> 
+<p>Kanaafuu, Karaakee ilaalladhu. Karaa sirrii irra jirta taanaan galma kee daddaftee seenuu dandeessa waanta'eef. Jireenyi Daawwannaa ispoortii miti. Yaada/mul'ata jireenya keef fayida-qabeessa ta'e kuufadhu, kan isaan alaa haqi. Jireenyi saanii/qodaa nyata kee osoo hin taane, hanga nyaata keetiiti. Dirree kubbaa irra taphattu osoo hin taane hangati taphattee agarsiistuudha.</p> 
+<p>Milkaa'insi Adeemsadha sababni isaa bakka gahumsaa dhaabbataa hin qabu. Caalchisii jiraadhu, caalchisii kolfi, caalchisii baradhu, caalchisiis jaal'adhu. Yoo kufte nama sikaasu qofa eeguu osoo hin taane dursii yaalii geggeessi si caalaa namni siif dhimmu hin jiruutii.  Namoota biroo fakkaachuufi caaluuf hin dhama'iin, siin caalaas kan si fakkatu waan hin jirreef ofiikee fakkaachuufi caaluuf dhama'i. Rakkinni kee har'aa cimina, milkaa'inaafi dhuga baatii kee guyyaa boriiti. Kanaaf abdii hin kutatinii jabaadhu. Xumureera!!!</p>
+<h2>Dubbiiwwan ijoo Boqonnichaa</h2>
+	<p><h3>1. Iggita(bantuu) sammuu ofii abbaadhumatu beeka.<br>
+	2. Kufaatii guddaan namoonni kasaaran kufan yaadanii shakkuudha.<br>
+	3. Hamma ta'ee hin argamnetti waanti hundinuu waan hin danda'amne fakkaata.<br>
+	4. Sammuun ofii akkuma kuusaa mul'ata ofii tahe, diina ofii isa jalqabaati.<br>
+	5. Wantoonni bu'uura jireenyaa namoonni milkaa'an caalaatti guuttatan yeroodha.<br>
+	6. Yoo milkaa'uu barbaadde gaticha kaffali.<br>
+	7. Namni kaayyoo malee deemuuf qilleensi tokkumadha.<br>
+	8. Dhiibbaan namoota injifachuuf taphatan cimoo taasisa. Warra akka hin injifatamneef taphatan immoo anniisaa duraa fixa.</p></h3><br>
+
+</p>` },
+            { title: "Wabiiwwan", content: `<h2>WABIIWWAN</h2>
+            <p>•	Eebbisaa Baayisaa(2022), "Gatiin Namaa meeqa"?. 
+       Daystar printing and trading<br>
+•	Miratuu Shaanqoo, "Garbummaa Birmadummaa  
+       fakkaattu", maxxansa 4ffaa, 2020, nachsar printing  
+        press <br>
+•	Kelly-Plate, J. Eubanks, E. (2010). "Applying Life skills".  
+        New York: The McGraw-Hill Companies, Inc.<br>
+•	Lammeessaa Jammaraa, "IFAAJEE", 2021. Finfinnee 
+Oromiyaa,<br>
+•	Bailin, Sh.(1987). "Critical and Creative Thinking". Vol. IX.1, 
+         Winter.<br>
+•	Eebbisaa Baayisaa Abeetuu, "Miiltoo", Gulaala 8ffaa, 
+         Nachsar printing, Finfinnee, Oromiyaa, 2020<br>
+•	Kagan, S. (2004). Macmillan Life 
+         Skills.www.macmillanenglish.com/life-skills.<br>
+•	Shiv Khera, "YOU CAN WIN". Published by Rajive Beri for 
+         Maximilan India Ltd, 2/10 anson Road, Daryagani,  
+                     NewDelhi 11002, c1998, 2002<br>
+•	Hinseenee Makuriyaa, "Gonfoo Mo'ichaa"<br>
+•	Miratuu Shaanqoo, "Siif Galeeraa?"<br>
+</p>` }
+           ];
+
+        let current = 0;
+        const main = document.getElementById('main-container');
+        const menu = document.getElementById('menu-list');
+
+        function init() {
+            bookPages.forEach((p, i) => {
+                const li = document.createElement('li');
+                li.innerText = p.title;
+                li.onclick = () => goTo(i);
+                menu.appendChild(li);
+
+                const sec = document.createElement('section');
+                sec.id = `s${i}`;
+                sec.innerHTML = p.content;
+                if(i === 0) sec.classList.add('active');
+                main.appendChild(sec);
+            });
+        }
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        function goTo(idx) {
+            document.getElementById(`s${current}`).classList.remove('active');
+            current = idx;
+            document.getElementById(`s${current}`).classList.add('active');
+            document.getElementById('header-label').innerText = bookPages[current].title.toUpperCase();
+            if(document.getElementById('sidebar').classList.contains('active')) toggleMenu();
+            document.getElementById('scroll-box').scrollTop = 0;
+        }
+
+        function change(step) {
+            let next = current + step;
+            if (next >= 0 && next < bookPages.length) goTo(next);
+        }
+
+        // PWA Install Logic
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBanner').style.display = 'block';
+        });
+
+        async function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt = null;
+                document.getElementById('installBanner').style.display = 'none';
+            }
+        }
+
+        init();
+	if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("./sw.js")
+      .then(() => console.log("SW Registered Successfully"))
+      .catch((err) => console.log("SW Registration Failed", err));
+  });
+}
+    </script>
+    
+</body>
+</html>
